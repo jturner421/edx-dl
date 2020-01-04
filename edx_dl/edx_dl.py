@@ -141,13 +141,14 @@ def _display_courses(courses):
         logging.info('     %s', course.url)
 
 
-def get_courses_info(url, headers):
+def get_courses_info(url, headers, session):
     """
     Extracts the courses information from the dashboard.
     """
     logging.info('Extracting course information from dashboard.')
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, headers, session)
+
     page_extractor = get_page_extractor(url)
     courses = page_extractor.extract_courses_from_html(page, BASE_URL)
 
@@ -1049,7 +1050,7 @@ def main():
         exit(ExitCode.WRONG_EMAIL_OR_PASSWORD)
 
     # Parse and select the available courses
-    courses = get_courses_info(DASHBOARD, headers)
+    courses = get_courses_info(DASHBOARD, headers, s)
     available_courses = [course for course in courses if course.state == 'Started']
     selected_courses = parse_courses(args, available_courses)
 

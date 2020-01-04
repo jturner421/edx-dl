@@ -50,19 +50,20 @@ def directory_name(initial_name):
     return result if result != "" else "course_folder"
 
 
-def get_page_contents(url, headers):
+def get_page_contents(url, headers, session):
     """
     Get the contents of the page at the URL given by url. While making the
     request, we use the headers given in the dictionary in headers.
     """
-    result = urlopen(Request(url, None, headers))
-    try:
-        # for python3
-        charset = result.headers.get_content_charset(failobj="utf-8")
-    except:
-        charset = result.info().getparam('charset') or 'utf-8'
-    return result.read().decode(charset)
-
+    # result = urlopen(Request(url, None, headers))
+    result = session.get(url, headers=headers)
+    # try:
+    #     # for python3
+    #     charset = result.headers.get_content_charset(failobj="utf-8")
+    # except:
+    #     charset = result.info().getparam('charset') or 'utf-8'
+   # return result.read().decode(charset)
+    return result.encoding
 
 def get_page_contents_as_json(url, headers):
     """
