@@ -14,6 +14,11 @@ import os
 import pickle
 import re
 import sys
+from lxml import html
+from requests_html import HTMLSession
+
+import pywebcopy
+import requests
 
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
@@ -55,6 +60,7 @@ from .utils import (
     mkdir_p,
     remove_duplicates,
 )
+
 
 
 OPENEDX_SITES = {
@@ -150,7 +156,7 @@ def get_courses_info(url, headers):
     return courses
 
 
-def _get_initial_token(url):
+def _get_initial_token(url, session):
     """
     Create initial connection to get authentication token for future
     requests.
@@ -161,18 +167,23 @@ def _get_initial_token(url):
     """
     logging.info('Getting initial CSRF token.')
 
-    cookiejar = CookieJar()
-    opener = build_opener(HTTPCookieProcessor(cookiejar))
-    install_opener(opener)
-    opener.open(url)
+    r = requests.get(url)
+    csrftoken = r.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in response.cookies])
+    # cookiejar = CookieJar()
+    # opener = build_opener(HTTPCookieProcessor(cookiejar))
+    # install_opener(opener)
+    # opener.open(url)
 
-    for cookie in cookiejar:
-        if cookie.name == 'csrftoken':
-            logging.info('Found CSRF token.')
-            return cookie.value
-
-    logging.warn('Did not find the CSRF token.')
-    return ''
+    # for cookie in cookiejar:
+    #     if cookie.name == 'csrftoken':
+    #         logging.info('Found CSRF token.')
+    #         return cookie.value
+    if csrftoken:
+        return csrftoken.value
+    else:
+        logging.warn('Did not find the CSRF token.')
+        return ''
 
 
 def get_available_sections(url, headers):
@@ -210,19 +221,25 @@ def edx_get_subtitle(url, headers,
         return None
 
 
-def edx_login(url, headers, username, password):
+def edx_login(url, headers, username, password, session):
     """
     Log in user into the openedx website.
     """
     logging.info('Logging into Open edX site: %s', url)
 
-    post_data = urlencode({'email': username,
-                           'password': password,
-                           'remember': False}).encode('utf-8')
+    payload = {'email': username,
+               'password': password
+               }
 
-    request = Request(url, post_data, headers)
-    response = urlopen(request)
-    resp = json.loads(response.read().decode('utf-8'))
+    # post_data = urlencode({'email': username,
+    #                        'password': password,
+    #                        'remember': False}).encode('utf-8')
+
+    # request = Request(url, post_data, headers)
+    response = session.post(url, data=payload, headers=headers)
+    # response = urlopen(request)
+   # resp = json.loads(response.read().decode('utf-8'))
+    resp = response.status_code
 
     return resp
 
@@ -410,21 +427,33 @@ def parse_args():
     return args
 
 
-def edx_get_headers():
+def edx_get_headers(session):
     """
     Build the Open edX headers to create future requests.
     """
     logging.info('Building initial headers for future requests.')
+    logging.info('Getting initial CSRF token.')
+
+    headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
+               'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)'
+                             'Chrome/79.0.3945.88 Safari/537.36'
+               }
+    session.get(EDX_HOMEPAGE, headers=headers)
+    # tree = html.fromstring(r.text)
+    # csrftoken = list(set(tree.xpath("//input[@name='csrfmiddlewaretoken']/@value")))[0]
+    csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
 
     headers = {
-        'User-Agent': 'edX-downloader/0.01',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
         'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'X-CSRFToken': csrftoken.value,
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        'cookie': headers['cookie'],
         'Referer': EDX_HOMEPAGE,
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': _get_initial_token(EDX_HOMEPAGE),
+        'X-Requested-With': 'XMLHttpRequest'
     }
-
     logging.debug('Headers built: %s', headers)
     return headers
 
@@ -837,12 +866,24 @@ def download(args, selections, all_units, headers):
             mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
+                download_web_page(subsection, target_dir, headers)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
                     download_unit(unit, args, target_dir, filename_prefix,
                                   headers)
+
+
+def download_web_page(subsection, target_dir, headers):
+    for i, (key, value) in enumerate(headers.items()):
+        pywebcopy.SESSION.headers.update({
+            key: value[1]}
+        )
+    kwargs = {
+
+    }
+    pywebcopy.save_webpage(subsection.url, target_dir)
 
 
 def remove_repeated_urls(all_units):
@@ -997,11 +1038,13 @@ def main():
         exit(ExitCode.MISSING_CREDENTIALS)
 
     # Prepare Headers
-    headers = edx_get_headers()
+    s = requests.Session()
+    headers = edx_get_headers(s)
 
     # Login
-    resp = edx_login(LOGIN_API, headers, args.username, args.password)
-    if not resp.get('success', False):
+    resp = edx_login(LOGIN_API, headers, args.username, args.password,s)
+    # if not resp.get('success', False):
+    if not resp == 200:
         logging.error(resp.get('value', "Wrong Email or Password."))
         exit(ExitCode.WRONG_EMAIL_OR_PASSWORD)
 
