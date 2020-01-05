@@ -187,13 +187,13 @@ def _get_initial_token(url, session):
         return ''
 
 
-def get_available_sections(url, headers):
+def get_available_sections(url, headers, session):
     """
     Extracts the sections and subsections from a given url
     """
     logging.debug("Extracting sections for :" + url)
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, headers, session)
     page_extractor = get_page_extractor(url)
     sections = page_extractor.extract_sections_from_html(page, BASE_URL)
 
@@ -1058,12 +1058,12 @@ def main():
     if args.platform == 'edx':
         all_selections = {selected_course:
                           get_available_sections(selected_course.url.replace('info', 'course'),
-                                                 headers)
+                                                 headers, s)
                           for selected_course in selected_courses}
     else:
         all_selections = {selected_course:
                           get_available_sections(selected_course.url.replace('info', 'courseware'),
-                                                 headers)
+                                                 headers, s)
                           for selected_course in selected_courses}
 
     selections = parse_sections(args, all_selections)

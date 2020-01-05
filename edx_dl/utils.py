@@ -56,14 +56,14 @@ def get_page_contents(url, headers, session):
     request, we use the headers given in the dictionary in headers.
     """
     # result = urlopen(Request(url, None, headers))
-    result = session.get(url, headers=headers)
+    result = session.get(url)
     # try:
     #     # for python3
     #     charset = result.headers.get_content_charset(failobj="utf-8")
     # except:
     #     charset = result.info().getparam('charset') or 'utf-8'
    # return result.read().decode(charset)
-    return result.encoding
+    return result.text
 
 def get_page_contents_as_json(url, headers):
     """
