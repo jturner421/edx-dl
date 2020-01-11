@@ -1006,6 +1006,17 @@ def save_urls_to_file(urls, filename):
     file_.close()
 
 
+def add_web_page_name_to_extract(all_web_pages, filtered_units):
+    dict3 = {**filtered_units, **all_web_pages}
+    for index, (key,value) in enumerate(dict3.items()):
+        if key in filtered_units and key in all_web_pages:
+            try:
+                filtered_units[key][0].resources_urls = value
+            except IndexError:
+                continue
+    return  filtered_units
+
+
 def main():
     """
     Main program function
@@ -1069,7 +1080,7 @@ def main():
     for selected_sections in selections.values():
         for selected_section in selected_sections:
             for k, v in enumerate(selected_section.subsections):
-                all_web_pages.update({v.name: v.url})
+                all_web_pages.update({v.url: v.name})
 
 
     extractor = extract_all_units_in_parallel
@@ -1093,6 +1104,7 @@ def main():
     # better approach will be to create symbolic or hard links for the repeated
     # units to avoid losing information
     filtered_units = remove_repeated_urls(all_units)
+    filtered_units = add_web_page_name_to_extract(all_web_pages, filtered_units)
     num_all_urls = num_urls_in_units_dict(all_units)
     num_filtered_urls = num_urls_in_units_dict(filtered_units)
     logging.warn('Removed %d duplicated urls from %d in total',
@@ -1105,6 +1117,8 @@ def main():
         save_urls_to_file(urls, args.export_filename)
     else:
         download(args, selections, filtered_units, headers)
+
+
 
 
 if __name__ == '__main__':
