@@ -17,7 +17,8 @@ import sys
 
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
-
+import requests
+import pywebcopy
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlencode
@@ -96,7 +97,7 @@ OPENEDX_SITES = {
     }
 }
 BASE_URL = OPENEDX_SITES['edx']['url']
-EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session'
+EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session/'
 LOGIN_API = BASE_URL + '/login_ajax'
 DASHBOARD = BASE_URL + '/dashboard'
 COURSEWARE_SEL = OPENEDX_SITES['edx']['courseware-selector']
@@ -428,6 +429,33 @@ def edx_get_headers():
     logging.debug('Headers built: %s', headers)
     return headers
 
+def pywebcopy_get_headers(session, username, password):
+    """
+    Build the Open edX headers to create future requests.
+
+    """
+    logging.info('Building Pywebcopy headers for future requests.')
+
+    headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
+               'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)'
+                             'Chrome/79.0.3945.88 Safari/537.36'}
+    session.get(EDX_HOMEPAGE, headers=headers)
+
+    csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
+
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'X-CSRFToken': csrftoken.value,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        'cookie': headers['cookie'],
+        'Referer': EDX_HOMEPAGE,
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    logging.debug('PywebCopy Headers built: %s', headers)
+    return session
 
 def extract_units(url, headers, file_formats):
     """
@@ -999,6 +1027,10 @@ def main():
     # Prepare Headers
     headers = edx_get_headers()
 
+    # Prepare Pywebcopy Headers
+    s= pywebcopy.SESSION
+    session_headers = pywebcopy_get_headers(s, args.username, args.password)
+
     # Login
     resp = edx_login(LOGIN_API, headers, args.username, args.password)
     if not resp.get('success', False):
@@ -1032,6 +1064,13 @@ def main():
                 for selected_sections in selections.values()
                 for selected_section in selected_sections
                 for subsection in selected_section.subsections]
+
+    all_web_pages = {}
+    for selected_sections in selections.values():
+        for selected_section in selected_sections:
+            for k, v in enumerate(selected_section.subsections):
+                all_web_pages.update({v.name: v.url})
+
 
     extractor = extract_all_units_in_parallel
     if args.sequential:
