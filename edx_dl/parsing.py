@@ -434,5 +434,8 @@ def get_page_extractor(url):
 
 
 def is_youtube_url(url):
-    re_youtube_url = re.compile(r'(https?\:\/\/(?:www\.)?(?:youtube\.com|youtu\.?be)\/.*?)')
-    return re_youtube_url.match(url)
+    try:
+        re_youtube_url = re.compile(r'(https?\:\/\/(?:www\.)?(?:youtube\.com|youtu\.?be)\/.*?)')
+        return re_youtube_url.match(url)
+    except TypeError:
+        pass

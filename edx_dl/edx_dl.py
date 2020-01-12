@@ -724,6 +724,9 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     if is_youtube_url(url):
         filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
         filename = os.path.join(target_dir, filename_template)
+    elif url:
+        filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
+        filename = os.path.join(target_dir, filename_template)
     else:
         original_filename = url.rsplit('/', 1)[1]
         filename = os.path.join(target_dir,
@@ -835,7 +838,16 @@ def download_video(video, args, target_dir, filename_prefix, headers):
                                                    filename_prefix, headers)
         skip_or_download(sub_downloads, headers, args, download_subtitle)
 
-def download_unit(unit, args, target_dir, filename_prefix, headers,pyweb_session):
+
+def download_web_page(unit_url, target_dir, filename_prefix, pyweb_session, headers, args):
+    if unit_url is not None:
+        web_page_downloads = _build_url_downloads([unit_url[0].unit_page_url],
+                                                  target_dir,
+                                                  filename_prefix)
+        skip_or_download(web_page_downloads, headers, args)
+
+
+def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_session):
     """
     Downloads the urls in unit based on args in the given target_dir
     with filename_prefix
@@ -843,7 +855,9 @@ def download_unit(unit, args, target_dir, filename_prefix, headers,pyweb_session
     if len(unit.videos) == 1:
         download_video(unit.videos[0], args, target_dir, filename_prefix,
                        headers)
-
+    elif len(unit.unit_url) >= 1:
+        # web_page_downloads = _build_url_downloads(unit.unit_url, target_dir, filename_prefix)
+        download_web_page(unit.unit_url, target_dir, filename_prefix, pyweb_session, headers, args)
     else:
         # we change the filename_prefix to avoid conflicts when downloading
         # subtitles
@@ -851,15 +865,18 @@ def download_unit(unit, args, target_dir, filename_prefix, headers,pyweb_session
             new_prefix = filename_prefix + ('-%02d' % i)
             download_video(video, args, target_dir, new_prefix, headers)
 
-    download_web_page(unit.unit_url[0], args, target_dir, filename_prefix, pyweb_session)
+
     res_downloads = _build_url_downloads(unit.resources_urls, target_dir,
                                          filename_prefix)
+
+
     skip_or_download(res_downloads, headers, args)
 
-def download_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
+def save_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
     kwargs = {'zip_project_folder': False,
               'url': unit_url.unit_page_url,
-              'project_folder': target_dir
+              'project_folder': target_dir,
+              'over_write': True
               }
     save_webpage(**kwargs)
 
@@ -883,17 +900,17 @@ def download(args, selections, all_units, headers, pyweb_session):
             # mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
-                subsection_dirname = "%02d-%s" % (subsection.position,
-                                           subsection.name)
-                target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
-                                      clean_filename(subsection_dirname))
-                mkdir_p(target_dir)
+                # subsection_dirname = "%02d-%s" % (subsection.position,
+                #                            subsection.name)
+                # target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
+                #                       clean_filename(subsection_dirname))
+                # mkdir_p(target_dir)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
-                    download_unit(unit, args, target_subsection_dir, filename_prefix,
-                                  headers,pyweb_session )
+                    download_unit(unit, args, target_dir, filename_prefix,
+                                  headers, pyweb_session )
 
 
 def remove_repeated_urls(all_units):
