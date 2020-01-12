@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 from six.moves import html_parser
 from bs4 import BeautifulSoup as BeautifulSoup_
 
-from .common import Course, Section, SubSection, Unit, Video
+from .common import Course, Section, SubSection, Unit, UnitUrl, Video
 
 
 # Force use of bs4 with html.parser
@@ -95,14 +95,16 @@ class ClassicEdXPageExtractor(PageExtractor):
 
         for unit_html in re_units.findall(page):
             unit = self.extract_unit(unit_html, BASE_URL, file_formats)
-            if len(unit.videos) > 0 or len(unit.resources_urls) > 0:
-                units.append(unit)
+            # if len(unit.videos) > 0 or len(unit.resources_urls) > 0:
+            #     units.append(unit)
+            units.append(unit)
         return units
 
     def extract_unit(self, text, BASE_URL, file_formats):
         """
         Parses the <div> of each unit and extracts the urls of its resources
         """
+        unit_url = []
         video_youtube_url = self.extract_video_youtube_url(text)
         available_subs_url, sub_template_url = self.extract_subtitle_urls(text, BASE_URL)
         mp4_urls = self.extract_mp4_urls(text)
@@ -113,6 +115,7 @@ class ClassicEdXPageExtractor(PageExtractor):
 
         resources_urls = self.extract_resources_urls(text, BASE_URL,
                                                      file_formats)
+        unit_url.append(UnitUrl(self.unit_page_url))
         return Unit(videos=videos, resources_urls=resources_urls)
 
     def extract_video_youtube_url(self, text):
@@ -286,6 +289,7 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
     def extract_unit(self, text, BASE_URL, file_formats):
         re_metadata = re.compile(r'data-metadata=&#39;(.*?)&#39;')
         videos = []
+        unit_url= []
         match_metadatas = re_metadata.findall(text)
         for match_metadata in match_metadatas:
             metadata = html_parser.HTMLParser().unescape(match_metadata)
@@ -309,9 +313,9 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
                                 sub_template_url=sub_template_url,
                                 mp4_urls=mp4_urls))
 
-        resources_urls = self.extract_resources_urls(text, BASE_URL,
-                                                     file_formats)
-        return Unit(videos=videos, resources_urls=resources_urls)
+        resources_urls = self.extract_resources_urls(text, BASE_URL, file_formats)
+        unit_url.append(UnitUrl(self.unit_page_url))
+        return Unit(videos=videos, resources_urls=resources_urls, unit_url=unit_url)
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
@@ -362,6 +366,8 @@ class NewEdXPageExtractor(CurrentEdXPageExtractor):
     """
     A new page extractor for the latest changes in layout of edx
     """
+    def __init__(self, unit_page_url):
+        self.unit_page_url = unit_page_url
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
@@ -416,7 +422,7 @@ def get_page_extractor(url):
         url.startswith('https://courses.edx.org') or
         url.startswith('https://mitxpro.mit.edu')
     ):
-        return NewEdXPageExtractor()
+        return NewEdXPageExtractor(url)
     elif (
         url.startswith('https://edge.edx.org') or
         url.startswith('https://lagunita.stanford.edu') or

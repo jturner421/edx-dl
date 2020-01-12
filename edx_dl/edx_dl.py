@@ -17,8 +17,8 @@ import sys
 
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
-import requests
 import pywebcopy
+from pywebcopy import save_webpage
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlencode
@@ -38,6 +38,7 @@ from .common import (
     DEFAULT_CACHE_FILENAME,
     Unit,
     Video,
+    UnitUrl,
     ExitCode,
     DEFAULT_FILE_FORMATS,
 )
@@ -227,6 +228,16 @@ def edx_login(url, headers, username, password):
 
     return resp
 
+def pyweb_login(url, headers, username, password, session):
+    """
+    Log in user into the openedx website for pywebcopy.
+    """
+    payload = {'email': username,
+               'password': password
+               }
+
+    response = session.post(url, data=payload, headers=headers)
+    return response
 
 def parse_args():
     """
@@ -455,7 +466,7 @@ def pywebcopy_get_headers(session, username, password):
         'X-Requested-With': 'XMLHttpRequest'
     }
     logging.debug('PywebCopy Headers built: %s', headers)
-    return session
+    return headers
 
 def extract_units(url, headers, file_formats):
     """
@@ -824,8 +835,7 @@ def download_video(video, args, target_dir, filename_prefix, headers):
                                                    filename_prefix, headers)
         skip_or_download(sub_downloads, headers, args, download_subtitle)
 
-
-def download_unit(unit, args, target_dir, filename_prefix, headers):
+def download_unit(unit, args, target_dir, filename_prefix, headers,pyweb_session):
     """
     Downloads the urls in unit based on args in the given target_dir
     with filename_prefix
@@ -833,6 +843,7 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
     if len(unit.videos) == 1:
         download_video(unit.videos[0], args, target_dir, filename_prefix,
                        headers)
+
     else:
         # we change the filename_prefix to avoid conflicts when downloading
         # subtitles
@@ -840,12 +851,19 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
             new_prefix = filename_prefix + ('-%02d' % i)
             download_video(video, args, target_dir, new_prefix, headers)
 
+    download_web_page(unit.unit_url[0], args, target_dir, filename_prefix, pyweb_session)
     res_downloads = _build_url_downloads(unit.resources_urls, target_dir,
                                          filename_prefix)
     skip_or_download(res_downloads, headers, args)
 
+def download_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
+    kwargs = {'zip_project_folder': False,
+              'url': unit_url.unit_page_url,
+              'project_folder': target_dir
+              }
+    save_webpage(**kwargs)
 
-def download(args, selections, all_units, headers):
+def download(args, selections, all_units, headers, pyweb_session):
     """
     Downloads all the resources based on the selections
     """
@@ -862,15 +880,20 @@ def download(args, selections, all_units, headers):
                                            selected_section.name)
             target_dir = os.path.join(args.output_dir, coursename,
                                       clean_filename(section_dirname))
-            mkdir_p(target_dir)
+            # mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
+                subsection_dirname = "%02d-%s" % (subsection.position,
+                                           subsection.name)
+                target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
+                                      clean_filename(subsection_dirname))
+                mkdir_p(target_dir)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
-                    download_unit(unit, args, target_dir, filename_prefix,
-                                  headers)
+                    download_unit(unit, args, target_subsection_dir, filename_prefix,
+                                  headers,pyweb_session )
 
 
 def remove_repeated_urls(all_units):
@@ -901,10 +924,13 @@ def remove_repeated_urls(all_units):
                                         mp4_urls=mp4_urls))
 
             resources_urls, existing_urls = remove_duplicates(unit.resources_urls, existing_urls)
+            unit_url, existing_urls = remove_duplicates(unit.unit_url, existing_urls)
 
-            if len(videos) > 0 or len(resources_urls) > 0:
+
+            if len(videos) > 0 or len(resources_urls) > 0 or len(unit_url) > 0:
                 reduced_units.append(Unit(videos=videos,
-                                          resources_urls=resources_urls))
+                                          resources_urls=resources_urls,
+                                          unit_url=unit_url))
 
         filtered_units[url] = reduced_units
     return filtered_units
@@ -925,6 +951,8 @@ def num_urls_in_units_dict(units_dict):
                 num_urls += int(video.sub_template_url is not None)
                 num_urls += len(video.mp4_urls)
             num_urls += len(unit.resources_urls)
+            num_urls += len(unit.unit_url)
+
 
     return num_urls
 
@@ -1006,17 +1034,6 @@ def save_urls_to_file(urls, filename):
     file_.close()
 
 
-def add_web_page_name_to_extract(all_web_pages, filtered_units):
-    dict3 = {**filtered_units, **all_web_pages}
-    for index, (key,value) in enumerate(dict3.items()):
-        if key in filtered_units and key in all_web_pages:
-            try:
-                filtered_units[key][0].resources_urls = value
-            except IndexError:
-                continue
-    return  filtered_units
-
-
 def main():
     """
     Main program function
@@ -1038,10 +1055,12 @@ def main():
     # Prepare Headers
     headers = edx_get_headers()
 
-    # Prepare Pywebcopy Headers
-    s= pywebcopy.SESSION
-    session_headers = pywebcopy_get_headers(s, args.username, args.password)
+    # Prepare PyWebCopy Headers
+    pyweb_session= pywebcopy.SESSION
+    pyweb_session_headers = pywebcopy_get_headers(pyweb_session, args.username, args.password)
 
+    # establish PyWebCopy Session
+    pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, args.username, args.password, pyweb_session)
     # Login
     resp = edx_login(LOGIN_API, headers, args.username, args.password)
     if not resp.get('success', False):
@@ -1104,7 +1123,7 @@ def main():
     # better approach will be to create symbolic or hard links for the repeated
     # units to avoid losing information
     filtered_units = remove_repeated_urls(all_units)
-    filtered_units = add_web_page_name_to_extract(all_web_pages, filtered_units)
+    # filtered_units = add_web_page_name_to_extract(all_web_pages, filtered_units)
     num_all_urls = num_urls_in_units_dict(all_units)
     num_filtered_urls = num_urls_in_units_dict(filtered_units)
     logging.warn('Removed %d duplicated urls from %d in total',
@@ -1116,7 +1135,7 @@ def main():
         urls = extract_urls_from_units(filtered_units, args.export_format)
         save_urls_to_file(urls, args.export_filename)
     else:
-        download(args, selections, filtered_units, headers)
+        download(args, selections, filtered_units, headers, pyweb_session)
 
 
 
