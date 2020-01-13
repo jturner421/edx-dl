@@ -46,6 +46,7 @@ from .parsing import (
     edx_json2srt,
     get_page_extractor,
     is_youtube_url,
+    is_web_page_url,
 )
 from .utils import (
     clean_filename,
@@ -721,12 +722,12 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     """
     Builds the appropriate filename for the given args
     """
-    if is_youtube_url(url):
+    if is_youtube_url(url) or is_web_page_url(url):
         filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
         filename = os.path.join(target_dir, filename_template)
-    elif url:
-        filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
-        filename = os.path.join(target_dir, filename_template)
+    # elif url:
+    #     filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
+    #     filename = os.path.join(target_dir, filename_template)
     else:
         original_filename = url.rsplit('/', 1)[1]
         filename = os.path.join(target_dir,
@@ -735,13 +736,15 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     return filename
 
 
-def download_url(url, filename, headers, args):
+def download_url(url, filename, headers, args, **options):
     """
     Downloads the given url in filename.
     """
 
     if is_youtube_url(url):
         download_youtube_url(url, filename, headers, args)
+    elif is_web_page_url(url):
+        save_webpage(url, project_folder=filename)
     else:
         import ssl
         import requests
@@ -802,7 +805,7 @@ def download_subtitle(url, filename, headers, args):
             f.write(subs_string.encode('utf-8'))
 
 
-def skip_or_download(downloads, headers, args, f=download_url):
+def skip_or_download(downloads, headers, args, f=download_url, **options):
     """
     downloads url into filename using download function f,
     if filename exists it skips
@@ -815,7 +818,10 @@ def skip_or_download(downloads, headers, args, f=download_url):
             logging.info('[download] %s => %s', url, filename)
         if args.dry_run:
             continue
-        f(url, filename, headers, args)
+        if not options:
+            f(url, filename, headers, args)
+        else:
+            f(url, filename, headers, args, pyweb_session=options['pyweb_session'])
 
 
 def download_video(video, args, target_dir, filename_prefix, headers):
@@ -839,12 +845,12 @@ def download_video(video, args, target_dir, filename_prefix, headers):
         skip_or_download(sub_downloads, headers, args, download_subtitle)
 
 
-def download_web_page(unit_url, target_dir, filename_prefix, pyweb_session, headers, args):
+def download_web_page(unit_url, target_dir, filename_prefix, **options):
     if unit_url is not None:
         web_page_downloads = _build_url_downloads([unit_url[0].unit_page_url],
                                                   target_dir,
                                                   filename_prefix)
-        skip_or_download(web_page_downloads, headers, args)
+        skip_or_download(web_page_downloads, options['headers'], options['args'], pyweb_session= options['pyweb_session'])
 
 
 def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_session):
@@ -857,7 +863,7 @@ def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_sessio
                        headers)
     elif len(unit.unit_url) >= 1:
         # web_page_downloads = _build_url_downloads(unit.unit_url, target_dir, filename_prefix)
-        download_web_page(unit.unit_url, target_dir, filename_prefix, pyweb_session, headers, args)
+        download_web_page(unit.unit_url, target_dir, filename_prefix, pyweb_session=pyweb_session, headers=headers, args =args)
     else:
         # we change the filename_prefix to avoid conflicts when downloading
         # subtitles

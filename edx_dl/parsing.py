@@ -439,3 +439,8 @@ def is_youtube_url(url):
         return re_youtube_url.match(url)
     except TypeError:
         pass
+
+
+def is_web_page_url(url):
+    re_web_page_url = re.compile(r'(https?\:\/\/)(?:courses\.)?(edx.org)?(\/courses\/)')
+    return re_web_page_url.match(url)
