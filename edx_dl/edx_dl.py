@@ -17,8 +17,10 @@ import sys
 
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
+
 import pywebcopy
 from pywebcopy import save_webpage
+from pywebcopy import WebPage, config
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlencode
@@ -722,12 +724,12 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     """
     Builds the appropriate filename for the given args
     """
-    if is_youtube_url(url) or is_web_page_url(url):
+    if is_youtube_url(url):
         filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
         filename = os.path.join(target_dir, filename_template)
-    # elif url:
-    #     filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
-    #     filename = os.path.join(target_dir, filename_template)
+    elif is_web_page_url(url):
+        # filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
+        filename = f"{target_dir}/{filename_prefix}-webpage"
     else:
         original_filename = url.rsplit('/', 1)[1]
         filename = os.path.join(target_dir,
@@ -744,7 +746,7 @@ def download_url(url, filename, headers, args, **options):
     if is_youtube_url(url):
         download_youtube_url(url, filename, headers, args)
     elif is_web_page_url(url):
-        save_webpage(url, project_folder=filename)
+        save_unit_webpage(url, filename)
     else:
         import ssl
         import requests
@@ -878,13 +880,16 @@ def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_sessio
 
     skip_or_download(res_downloads, headers, args)
 
-def save_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
-    kwargs = {'zip_project_folder': False,
-              'url': unit_url.unit_page_url,
-              'project_folder': target_dir,
-              'over_write': True
-              }
-    save_webpage(**kwargs)
+
+def save_unit_webpage(unit_url, target_dir):
+    # url = unit_url
+    # target_dir = target_dir
+    config.setup_config(unit_url, target_dir, project_name=None, over_write=True, bypass_robots=True)
+    wp = WebPage()
+    # wp.file_path = target_dir
+    wp.get(unit_url)
+    wp.save_complete()
+
 
 def download(args, selections, all_units, headers, pyweb_session):
     """
@@ -901,21 +906,21 @@ def download(args, selections, all_units, headers, pyweb_session):
         for selected_section in selected_sections:
             section_dirname = "%02d-%s" % (selected_section.position,
                                            selected_section.name)
-            target_dir = os.path.join(args.output_dir, coursename,
-                                      clean_filename(section_dirname))
-            # mkdir_p(target_dir)
+            #target_dir = os.path.join(args.output_dir, coursename,
+             #                         clean_filename(section_dirname))
+            #mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
-                # subsection_dirname = "%02d-%s" % (subsection.position,
-                #                            subsection.name)
-                # target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
-                #                       clean_filename(subsection_dirname))
-                # mkdir_p(target_dir)
+                subsection_dirname = "%02d-%s" % (subsection.position,
+                                            subsection.name)
+                target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
+                                       clean_filename(subsection_dirname))
+                mkdir_p(target_subsection_dir)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
-                    download_unit(unit, args, target_dir, filename_prefix,
+                    download_unit(unit, args, target_subsection_dir, filename_prefix,
                                   headers, pyweb_session )
 
 
@@ -1122,6 +1127,7 @@ def main():
     for selected_sections in selections.values():
         for selected_section in selected_sections:
             for k, v in enumerate(selected_section.subsections):
+
                 all_web_pages.update({v.url: v.name})
 
 

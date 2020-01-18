@@ -115,8 +115,21 @@ class ClassicEdXPageExtractor(PageExtractor):
 
         resources_urls = self.extract_resources_urls(text, BASE_URL,
                                                      file_formats)
-        unit_url.append(UnitUrl(self.unit_page_url))
+        url_to_check = UnitUrl(self.unit_page_url)
+        previous_section_name = ''
+        if self.check_for_section_name(text) == previous_section_name:
+            pass
+        else:
+            unit_url.append(url_to_check)
+            previous_section_name = self.check_for_section_name()
         return Unit(videos=videos, resources_urls=resources_urls)
+
+    def check_for_section_name(self, text):
+        with open(text) as fp:
+            soup = BeautifulSoup(fp, 'lxml')
+        section_name = soup.find(class_=re.compile('nav-item nav-item-section')).text
+        return section_name
+
 
     def extract_video_youtube_url(self, text):
         re_video_youtube_url = re.compile(r'data-streams=&#34;.*?1.0\d+\:(?:.*?)(.{11})')
@@ -314,8 +327,21 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
                                 mp4_urls=mp4_urls))
 
         resources_urls = self.extract_resources_urls(text, BASE_URL, file_formats)
-        unit_url.append(UnitUrl(self.unit_page_url))
+        url_to_check = UnitUrl(self.unit_page_url)
+        previous_section_name = ''
+        if self.check_for_section_name(text) == previous_section_name:
+            pass
+        else:
+            unit_url.append(url_to_check)
+            previous_section_name = self.check_for_section_name()
         return Unit(videos=videos, resources_urls=resources_urls, unit_url=unit_url)
+
+    def check_for_section_name(self, text):
+        with open(text) as fp:
+            soup = BeautifulSoup(fp, 'lxml')
+        section_name = soup.find(class_=re.compile('nav-item nav-item-section')).text
+        return section_name
+
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
