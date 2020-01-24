@@ -128,6 +128,7 @@ class ClassicEdXPageExtractor(PageExtractor):
         with open(text) as fp:
             soup = BeautifulSoup(fp, 'lxml')
         section_name = soup.find(class_=re.compile('nav-item nav-item-section')).text
+        print(section_name)
         return section_name
 
 
@@ -333,15 +334,8 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
             pass
         else:
             unit_url.append(url_to_check)
-            previous_section_name = self.check_for_section_name()
+            previous_section_name = self.check_for_section_name(text)
         return Unit(videos=videos, resources_urls=resources_urls, unit_url=unit_url)
-
-    def check_for_section_name(self, text):
-        with open(text) as fp:
-            soup = BeautifulSoup(fp, 'lxml')
-        section_name = soup.find(class_=re.compile('nav-item nav-item-section')).text
-        return section_name
-
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
@@ -413,14 +407,27 @@ class NewEdXPageExtractor(CurrentEdXPageExtractor):
                 return None
 
         def _make_subsections(section_soup):
+            sub_sec_nav_items= []
+            sub_sections_soup = section_soup.find_all(class_="vertical-title")
+            for sub in sub_sections_soup:
+                print(sub.text.strip())
+
             try:
+                sub_nav = section_soup.find_all(class_="subsection-title")
+                for s in sub_nav:
+                    sub_sections_soup = section_soup.find_all(class_="vertical-title")
+                    for sub_sec in sub_sections_soup:
+                            sub_sec_nav_items.append({s.text.strip(): sub_sec.text.strip()})
+
                 subsections_soup = section_soup.select("li.vertical.outline-item.focusable")
+                # sub_title = section_soup.find_all(class_="subsection-title")
             except AttributeError:
                 return []
             # FIXME correct extraction of subsection.name (unicode)
             subsections = [SubSection(position=i,
                                       url=s.a['href'],
                                       name=s.a.div.div.string.strip())
+
                            for i, s in enumerate(subsections_soup, 1)]
 
             return subsections

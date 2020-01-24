@@ -88,6 +88,7 @@ class Section(object):
         self.position = position
         self.name = name
         self.url = url
+        self.nav_item_section = None
         self.subsections = subsections
 
 
@@ -109,6 +110,7 @@ class SubSection(object):
         """
         self.position = position
         self.name = name
+        self.nav_item = None
         self.url = url
 
     def __repr__(self):
