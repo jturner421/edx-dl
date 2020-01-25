@@ -102,8 +102,8 @@ OPENEDX_SITES = {
     }
 }
 BASE_URL = OPENEDX_SITES['edx']['url']
-EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session'
-LOGIN_API = BASE_URL + '/login_ajax'
+# EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session'
+LOGIN_API = BASE_URL + '/login'
 DASHBOARD = BASE_URL + '/dashboard'
 COURSEWARE_SEL = OPENEDX_SITES['edx']['courseware-selector']
 
@@ -141,13 +141,13 @@ def _display_courses(courses):
         logging.info('     %s', course.url)
 
 
-def get_courses_info(url, headers, session):
+def get_courses_info(url, session):
     """
     Extracts the courses information from the dashboard.
     """
     logging.info('Extracting course information from dashboard.')
 
-    page = get_page_contents(url, headers, session)
+    page = get_page_contents(url, session)
 
     page_extractor = get_page_extractor(url)
     courses = page_extractor.extract_courses_from_html(page, BASE_URL)
@@ -187,13 +187,13 @@ def _get_initial_token(url, session):
         return ''
 
 
-def get_available_sections(url, headers, session):
+def get_available_sections(url,session):
     """
     Extracts the sections and subsections from a given url
     """
     logging.debug("Extracting sections for :" + url)
 
-    page = get_page_contents(url, headers, session)
+    page = get_page_contents(url, session)
     page_extractor = get_page_extractor(url)
     sections = page_extractor.extract_sections_from_html(page, BASE_URL)
 
@@ -222,24 +222,34 @@ def edx_get_subtitle(url, headers,
         return None
 
 
-def edx_login(url, headers, username, password, session):
+def edx_login(url, username, password, session):
     """
     Log in user into the openedx website.
     """
+    logging.info('Building initial headers for future requests.')
+    logging.info('Getting initial CSRF token.')
+    headers = {}
+    session.get(BASE_URL)
+    csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
+    logging.debug('Headers built: %s', headers)
     logging.info('Logging into Open edX site: %s', url)
 
-    payload = {'email': username,
-               'password': password
-               }
+    payload = {'email': username, 'password': password}
+    headers = {
+        'X-CSRFToken': csrftoken.value,
+        'Referer': 'https://courses.edx.org/login',
+        'Host': 'courses.edx.org',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'cookie': headers['cookie'],
+        'Accept - Encoding': 'gzip, deflate, br',
+        'content-type': 'application/x-www-form-urlencoded',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,'
+                  'application/signed-exchange;v=b3;q=0.9'
+    }
 
-    # post_data = urlencode({'email': username,
-    #                        'password': password,
-    #                        'remember': False}).encode('utf-8')
-
-    # request = Request(url, post_data, headers)
     response = session.post(url, data=payload, headers=headers)
-    # response = urlopen(request)
-   # resp = json.loads(response.read().decode('utf-8'))
     resp = response.status_code
 
     return resp
@@ -440,39 +450,37 @@ def edx_get_headers(session):
                              'Chrome/79.0.3945.88 Safari/537.36'
                }
     session.get(EDX_HOMEPAGE, headers=headers)
-    # tree = html.fromstring(r.text)
-    # csrftoken = list(set(tree.xpath("//input[@name='csrfmiddlewaretoken']/@value")))[0]
     csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
     headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
 
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/79.0.3945.88 Safari/537.36',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'X-CSRFToken': csrftoken.value,
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-        'cookie': headers['cookie'],
-        'Referer': EDX_HOMEPAGE,
-        'X-Requested-With': 'XMLHttpRequest'
-    }
+    # headers = {
+    #     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+    #                   'Chrome/79.0.3945.88 Safari/537.36',
+    #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+    #     'X-CSRFToken': csrftoken.value,
+    #     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    #     'cookie': headers['cookie'],
+    #     'Referer': EDX_HOMEPAGE,
+    #     'X-Requested-With': 'XMLHttpRequest'
+   # }
     logging.debug('Headers built: %s', headers)
-    return headers
+    return session
 
 
-def extract_units(url, headers, file_formats):
+def extract_units(url, session, file_formats):
     """
     Parses a webpage and extracts its resources e.g. video_url, sub_url, etc.
     """
     logging.info("Processing '%s'", url)
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, session)
     page_extractor = get_page_extractor(url)
     units = page_extractor.extract_units_from_html(page, BASE_URL, file_formats)
 
     return units
 
 
-def extract_all_units_in_sequence(urls, headers, file_formats):
+def extract_all_units_in_sequence(urls, session, file_formats):
     """
     Returns a dict of all the units in the selected_sections: {url, units}
     sequentially, this is clearer for debug purposes
@@ -480,7 +488,7 @@ def extract_all_units_in_sequence(urls, headers, file_formats):
     logging.info('Extracting all units information in sequentially.')
     logging.debug('urls: ' + str(urls))
 
-    units = [extract_units(url, headers, file_formats) for url in urls]
+    units = [extract_units(url, session, file_formats) for url in urls]
     all_units = dict(zip(urls, units))
 
     return all_units
@@ -847,11 +855,13 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
     skip_or_download(res_downloads, headers, args)
 
 
-def download(args, selections, all_units, headers):
+def download(args, selections, all_units, session):
     """
     Downloads all the resources based on the selections
     """
     logging.info("Output directory: " + args.output_dir)
+
+
 
     # Download Videos
     # notice that we could iterate over all_units, but we prefer to do it over
@@ -867,7 +877,7 @@ def download(args, selections, all_units, headers):
             mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
-                download_web_page(subsection, target_dir, headers)
+                # download_web_page(subsection, target_dir, session)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
@@ -876,14 +886,8 @@ def download(args, selections, all_units, headers):
                                   headers)
 
 
-def download_web_page(subsection, target_dir, headers):
-    for i, (key, value) in enumerate(headers.items()):
-        pywebcopy.SESSION.headers.update({
-            key: value[1]}
-        )
-    kwargs = {
+def download_web_page(subsection, target_dir, session):
 
-    }
     pywebcopy.save_webpage(subsection.url, target_dir)
 
 
@@ -943,7 +947,7 @@ def num_urls_in_units_dict(units_dict):
     return num_urls
 
 
-def extract_all_units_with_cache(all_urls, headers, file_formats,
+def extract_all_units_with_cache(all_urls, file_formats, session,
                                  filename=DEFAULT_CACHE_FILENAME,
                                  extractor=extract_all_units_in_parallel):
     """
@@ -965,7 +969,7 @@ def extract_all_units_with_cache(all_urls, headers, file_formats,
     new_urls = [url for url in all_urls if url not in cached_units]
     logging.info('loading %d urls from cache [%s]', len(cached_units.keys()),
                  filename)
-    new_units = extractor(new_urls, headers, file_formats)
+    new_units = extractor(new_urls, file_formats)
     all_units = cached_units.copy()
     all_units.update(new_units)
 
@@ -1040,30 +1044,31 @@ def main():
 
     # Prepare Headers
     s = requests.Session()
-    headers = edx_get_headers(s)
+    # = edx_get_headers(s)
+    s = edx_get_headers(s)
+    pyweb_initiate_session()
 
     # Login
-    resp = edx_login(LOGIN_API, headers, args.username, args.password,s)
+    resp = edx_login(LOGIN_API, args.username, args.password, s)
+
     # if not resp.get('success', False):
     if not resp == 200:
         logging.error(resp.get('value', "Wrong Email or Password."))
         exit(ExitCode.WRONG_EMAIL_OR_PASSWORD)
 
     # Parse and select the available courses
-    courses = get_courses_info(DASHBOARD, headers, s)
+    courses = get_courses_info(DASHBOARD, s)
     available_courses = [course for course in courses if course.state == 'Started']
     selected_courses = parse_courses(args, available_courses)
 
     # Parse the sections and build the selections dict filtered by sections
     if args.platform == 'edx':
         all_selections = {selected_course:
-                          get_available_sections(selected_course.url.replace('info', 'course'),
-                                                 headers, s)
+                          get_available_sections(selected_course.url.replace('info', 'course'),s)
                           for selected_course in selected_courses}
     else:
         all_selections = {selected_course:
-                          get_available_sections(selected_course.url.replace('info', 'courseware'),
-                                                 headers, s)
+                          get_available_sections(selected_course.url.replace('info', 'courseware'),s)
                           for selected_course in selected_courses}
 
     selections = parse_sections(args, all_selections)
@@ -1082,11 +1087,11 @@ def main():
         extractor = extract_all_units_in_sequence
 
     if args.cache:
-        all_units = extract_all_units_with_cache(all_urls, headers,
-                                                 file_formats,
+        all_units = extract_all_units_with_cache(all_urls,
+                                                 file_formats, s,
                                                  extractor=extractor)
     else:
-        all_units = extractor(all_urls, headers, file_formats)
+        all_units = extractor(all_urls, s, file_formats)
 
     parse_units(selections)
 
@@ -1109,7 +1114,30 @@ def main():
         urls = extract_urls_from_units(filtered_units, args.export_format)
         save_urls_to_file(urls, args.export_filename)
     else:
-        download(args, selections, filtered_units, headers)
+        download(args, selections, filtered_units, s)
+
+
+def pyweb_initiate_session():
+    pywebcopy.SESSION.get(BASE_URL)
+    csrftokenv1 = pywebcopy.SESSION.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers = {}
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in pywebcopy.SESSION.cookies])
+    payload = {'email': 'jturner421@gmail.com', 'password': 'durin7456'}
+    headers = {
+        'X-CSRFToken': csrftokenv1.value,
+        'Referer': 'https://courses.edx.org/login',
+        'Host': 'courses.edx.org',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'cookie': headers['cookie'],
+        'Accept - Encoding': 'gzip, deflate, br',
+        'content-type': 'application/x-www-form-urlencoded',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,'
+                  'application/signed-exchange;v=b3;q=0.9'
+    }
+    pywebcopy.SESSION.post(LOGIN_API, data=payload, headers=headers)
+    pywebcopy.save_webpage('https://courses.edx.org/courses/course-v1:W3Cx+CSS.0x+3T2019/jump_to/block-v1:W3Cx+CSS.0x+3T2019+type@vertical+block@71deac64f61a420781f0ed127d36e696',
+                           '/Users/jwt/PycharmProjects/edx-dl/Downloaded/CSS_Basics')
 
 
 if __name__ == '__main__':

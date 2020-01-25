@@ -50,7 +50,7 @@ def directory_name(initial_name):
     return result if result != "" else "course_folder"
 
 
-def get_page_contents(url, headers, session):
+def get_page_contents(url, session):
     """
     Get the contents of the page at the URL given by url. While making the
     request, we use the headers given in the dictionary in headers.
