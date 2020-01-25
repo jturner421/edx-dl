@@ -1,0 +1,43 @@
+.acInput {
+	width: 200px;
+}
+
+.acResults {
+	padding: 0px;
+	border: 1px solid WindowFrame;
+	background-color: Window;
+	overflow: hidden;
+}
+
+.acResults ul {
+	margin: 0px;
+	padding: 0px;
+	list-style-position: outside;
+	list-style: none;	
+}
+
+.acResults ul li {
+	margin: 0px;
+	padding: 2px 5px;
+	cursor: pointer;
+	display: block;
+	font: menu;
+	font-size: 12px;
+	overflow: hidden;
+}
+
+.acLoading {
+	background : url(./6df85fe3__indicator.42419428e52c.gif) right center no-repeat;
+}
+
+.acSelect {
+	background-color: Highlight;
+	color: HighlightText;
+}
+
+/*!
+* AerWebCopy Engine [version 6.1.1]
+* Copyright Aeroson Systems & Co.
+* File mirrored from https://prod-edxapp.edx-cdn.org/static/css/vendor/jquery.autocomplete.f95052778189.css
+* At UTC time: 2020-01-05 02:12:49.810201
+*/

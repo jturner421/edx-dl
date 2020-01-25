@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="en"><![endif]--><!--[if !IE]><!--><html lang="en"><!--
+
+* AerWebCopy Engine [version 6.1.1]
+* Copyright Aeroson Systems & Co.
+* File mirrored from https://courses.edx.org/login?next=/courses/course-v1:W3Cx+CSS.0x+3T2019/courseware/556d952aabbe47bfab3cb81ab3750995/46814d83d02b4973b62e7993321b4c09/1?activate_block_id=block-v1:W3Cx+CSS.0x+3T2019+type@vertical+block@71deac64f61a420781f0ed127d36e696
+* At UTC time: 2020-01-05 01:40:38.193771
+
+--><!--<![endif]-->
+<head dir="ltr">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={xpid:"XA4GVl5ACwAEV1JQAA==",licenseKey:"1beac94c95",applicationID:"3343327"};window.NREUM||(NREUM={}),__nr_require=function(t,n,e){function r(e){if(!n[e]){var o=n[e]={exports:{}};t[e][0].call(o.exports,function(n){var o=t[e][1][n];return r(o||n)},o,o.exports)}return n[e].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<e.length;o++)r(e[o]);return r}({1:[function(t,n,e){function r(t){try{s.console&&console.log(t)}catch(n){}}var o,i=t("ee"),a=t(20),s={};try{o=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,o.indexOf("dev")!==-1&&(s.dev=!0),o.indexOf("nr_dev")!==-1&&(s.nrDev=!0))}catch(c){}s.nrDev&&i.on("internal-error",function(t){r(t.stack)}),s.dev&&i.on("fn-err",function(t,n,e){r(e.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,n){return t}).join(", ")))},{}],2:[function(t,n,e){function r(t,n,e,r,s){try{p?p-=1:o(s||new UncaughtException(t,n,e),!0)}catch(f){try{i("ierr",[f,c.now(),!0])}catch(d){}}return"function"==typeof u&&u.apply(this,a(arguments))}function UncaughtException(t,n,e){this.message=t||"Uncaught error with no additional information",this.sourceURL=n,this.line=e}function o(t,n){var e=n?null:c.now();i("err",[t,e])}var i=t("handle"),a=t(21),s=t("ee"),c=t("loader"),f=t("gos"),u=window.onerror,d=!1,l="nr@seenError",p=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(h){"stack"in h&&(t(9),t(8),"addEventListener"in window&&t(5),c.xhrWrappable&&t(10),d=!0)}s.on("fn-start",function(t,n,e){d&&(p+=1)}),s.on("fn-err",function(t,n,e){d&&!e[l]&&(f(e,l,function(){return!0}),this.thrown=!0,o(e))}),s.on("fn-end",function(){d&&!this.thrown&&p>0&&(p-=1)}),s.on("internal-error",function(t){i("ierr",[t,c.now(),!0])})},{}],3:[function(t,n,e){t("loader").features.ins=!0},{}],4:[function(t,n,e){function r(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var o=t("ee"),i=t("handle"),a=t(9),s=t(8),c="learResourceTimings",f="addEventListener",u="resourcetimingbufferfull",d="bstResource",l="resource",p="-start",h="-end",m="fn"+p,w="fn"+h,v="bstTimer",g="pushState",y=t("loader");y.features.stn=!0,t(7),"addEventListener"in window&&t(5);var x=NREUM.o.EV;o.on(m,function(t,n){var e=t[0];e instanceof x&&(this.bstStart=y.now())}),o.on(w,function(t,n){var e=t[0];e instanceof x&&i("bst",[e,n,this.bstStart,y.now()])}),a.on(m,function(t,n,e){this.bstStart=y.now(),this.bstType=e}),a.on(w,function(t,n){i(v,[n,this.bstStart,y.now(),this.bstType])}),s.on(m,function(){this.bstStart=y.now()}),s.on(w,function(t,n){i(v,[n,this.bstStart,y.now(),"requestAnimationFrame"])}),o.on(g+p,function(t){this.time=y.now(),this.startPath=location.pathname+location.hash}),o.on(g+h,function(t){i("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),f in window.performance&&(window.performance["c"+c]?window.performance[f](u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["c"+c]()},!1):window.performance[f]("webkit"+u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["webkitC"+c]()},!1)),document[f]("scroll",r,{passive:!0}),document[f]("keypress",r,!1),document[f]("click",r,!1)}},{}],5:[function(t,n,e){function r(t){for(var n=t;n&&!n.hasOwnProperty(u);)n=Object.getPrototypeOf(n);n&&o(n)}function o(t){s.inPlace(t,[u,d],"-",i)}function i(t,n){return t[1]}var a=t("ee").get("events"),s=t("wrap-function")(a,!0),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";n.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(o(window),o(f.prototype)),a.on(u+"-start",function(t,n){var e=t[1],r=c(e,"nr@wrapped",function(){function t(){if("function"==typeof e.handleEvent)return e.handleEvent.apply(e,arguments)}var n={object:t,"function":e}[typeof e];return n?s(n,"fn-",null,n.name||"anonymous"):e});this.wrapped=t[1]=r}),a.on(d+"-start",function(t){t[1]=this.wrapped||t[1]})},{}],6:[function(t,n,e){function r(t,n,e){var r=t[n];"function"==typeof r&&(t[n]=function(){var t=i(arguments),n={};o.emit(e+"before-start",[t],n);var a;n[m]&&n[m].dt&&(a=n[m].dt);var s=r.apply(this,t);return o.emit(e+"start",[t,a],s),s.then(function(t){return o.emit(e+"end",[null,t],s),t},function(t){throw o.emit(e+"end",[t],s),t})})}var o=t("ee").get("fetch"),i=t(21),a=t(20);n.exports=o;var s=window,c="fetch-",f=c+"body-",u=["arrayBuffer","blob","json","text","formData"],d=s.Request,l=s.Response,p=s.fetch,h="prototype",m="nr@context";d&&l&&p&&(a(u,function(t,n){r(d[h],n,f),r(l[h],n,f)}),r(s,"fetch",c),o.on(c+"end",function(t,n){var e=this;if(n){var r=n.headers.get("content-length");null!==r&&(e.rxSize=r),o.emit(c+"done",[null,n],e)}else o.emit(c+"done",[t],e)}))},{}],7:[function(t,n,e){var r=t("ee").get("history"),o=t("wrap-function")(r);n.exports=r;var i=window.history&&window.history.constructor&&window.history.constructor.prototype,a=window.history;i&&i.pushState&&i.replaceState&&(a=i),o.inPlace(a,["pushState","replaceState"],"-")},{}],8:[function(t,n,e){var r=t("ee").get("raf"),o=t("wrap-function")(r),i="equestAnimationFrame";n.exports=r,o.inPlace(window,["r"+i,"mozR"+i,"webkitR"+i,"msR"+i],"raf-"),r.on("raf-start",function(t){t[0]=o(t[0],"fn-")})},{}],9:[function(t,n,e){function r(t,n,e){t[0]=a(t[0],"fn-",null,e)}function o(t,n,e){this.method=e,this.timerDuration=isNaN(t[1])?0:+t[1],t[0]=a(t[0],"fn-",this,e)}var i=t("ee").get("timer"),a=t("wrap-function")(i),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";n.exports=i,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),i.on(c+u,r),i.on(s+u,o)},{}],10:[function(t,n,e){function r(t,n){d.inPlace(n,["onreadystatechange"],"fn-",s)}function o(){var t=this,n=u.context(t);t.readyState>3&&!n.resolved&&(n.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,g,"fn-",s)}function i(t){y.push(t),h&&(b?b.then(a):w?w(a):(E=-E,O.data=E))}function a(){for(var t=0;t<y.length;t++)r([],y[t]);y.length&&(y=[])}function s(t,n){return n}function c(t,n){for(var e in t)n[e]=t[e];return n}t(5);var f=t("ee"),u=f.get("xhr"),d=t("wrap-function")(u),l=NREUM.o,p=l.XHR,h=l.MO,m=l.PR,w=l.SI,v="readystatechange",g=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],y=[];n.exports=u;var x=window.XMLHttpRequest=function(t){var n=new p(t);try{u.emit("new-xhr",[n],n),n.addEventListener(v,o,!1)}catch(e){try{u.emit("internal-error",[e])}catch(r){}}return n};if(c(p,x),x.prototype=p.prototype,d.inPlace(x.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,n){r(t,n),i(n)}),u.on("open-xhr-start",r),h){var b=m&&m.resolve();if(!w&&!m){var E=1,O=document.createTextNode(E);new h(a).observe(O,{characterData:!0})}}else f.on("fn-end",function(t){t[0]&&t[0].type===v||a()})},{}],11:[function(t,n,e){function r(t){if(!i(t))return null;var n=window.NREUM;if(!n.loader_config)return null;var e=(n.loader_config.accountID||"").toString()||null,r=(n.loader_config.agentID||"").toString()||null,s=(n.loader_config.trustKey||"").toString()||null;if(!e||!r)return null;var c=a.generateCatId(),f=a.generateCatId(),u=Date.now(),d=o(c,f,u,e,r,s);return{header:d,guid:c,traceId:f,timestamp:u}}function o(t,n,e,r,o,i){var a="btoa"in window&&"function"==typeof window.btoa;if(!a)return null;var s={v:[0,1],d:{ty:"Browser",ac:r,ap:o,id:t,tr:n,ti:e}};return i&&r!==i&&(s.d.tk=i),btoa(JSON.stringify(s))}function i(t){var n=!1,e=!1,r={};if("init"in NREUM&&"distributed_tracing"in NREUM.init&&(r=NREUM.init.distributed_tracing,e=!!r.enabled),e)if(t.sameOrigin)n=!0;else if(r.allowed_origins instanceof Array)for(var o=0;o<r.allowed_origins.length;o++){var i=s(r.allowed_origins[o]);if(t.hostname===i.hostname&&t.protocol===i.protocol&&t.port===i.port){n=!0;break}}return e&&n}var a=t(18),s=t(13);n.exports={generateTracePayload:r,shouldGenerateTrace:i}},{}],12:[function(t,n,e){function r(t){var n=this.params,e=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;r<p;r++)t.removeEventListener(l[r],this.listener,!1);n.aborted||(e.duration=s.now()-this.startTime,this.loadCaptureCalled||4!==t.readyState?null==n.status&&(n.status=0):a(this,t),e.cbTime=this.cbTime,d.emit("xhr-done",[t],t),c("xhr",[n,e,this.startTime]))}}function o(t,n){var e=t.responseType;if("json"===e&&null!==n)return n;var r="arraybuffer"===e||"blob"===e||"json"===e?t.response:t.responseText;return w(r)}function i(t,n){var e=f(n),r=t.params;r.host=e.hostname+":"+e.port,r.pathname=e.pathname,t.parsedOrigin=f(n),t.sameOrigin=t.parsedOrigin.sameOrigin}function a(t,n){t.params.status=n.status;var e=o(n,t.lastSize);if(e&&(t.metrics.rxSize=e),t.sameOrigin){var r=n.getResponseHeader("X-NewRelic-App-Data");r&&(t.params.cat=r.split(", ").pop())}t.loadCaptureCalled=!0}var s=t("loader");if(s.xhrWrappable){var c=t("handle"),f=t(13),u=t(11).generateTracePayload,d=t("ee"),l=["load","error","abort","timeout"],p=l.length,h=t("id"),m=t(16),w=t(15),v=window.XMLHttpRequest;s.features.xhr=!0,t(10),t(6),d.on("new-xhr",function(t){var n=this;n.totalCbs=0,n.called=0,n.cbTime=0,n.end=r,n.ended=!1,n.xhrGuids={},n.lastSize=null,n.loadCaptureCalled=!1,t.addEventListener("load",function(e){a(n,t)},!1),m&&(m>34||m<10)||window.opera||t.addEventListener("progress",function(t){n.lastSize=t.loaded},!1)}),d.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),d.on("open-xhr-end",function(t,n){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&n.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid);var e=u(this.parsedOrigin);e&&e.header&&(n.setRequestHeader("newrelic",e.header),this.dt=e)}),d.on("send-xhr-start",function(t,n){var e=this.metrics,r=t[0],o=this;if(e&&r){var i=w(r);i&&(e.txSize=i)}this.startTime=s.now(),this.listener=function(t){try{"abort"!==t.type||o.loadCaptureCalled||(o.params.aborted=!0),("load"!==t.type||o.called===o.totalCbs&&(o.onloadCalled||"function"!=typeof n.onload))&&o.end(n)}catch(e){try{d.emit("internal-error",[e])}catch(r){}}};for(var a=0;a<p;a++)n.addEventListener(l[a],this.listener,!1)}),d.on("xhr-cb-time",function(t,n,e){this.cbTime+=t,n?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof e.onload||this.end(e)}),d.on("xhr-load-added",function(t,n){var e=""+h(t)+!!n;this.xhrGuids&&!this.xhrGuids[e]&&(this.xhrGuids[e]=!0,this.totalCbs+=1)}),d.on("xhr-load-removed",function(t,n){var e=""+h(t)+!!n;this.xhrGuids&&this.xhrGuids[e]&&(delete this.xhrGuids[e],this.totalCbs-=1)}),d.on("addEventListener-end",function(t,n){n instanceof v&&"load"===t[0]&&d.emit("xhr-load-added",[t[1],t[2]],n)}),d.on("removeEventListener-end",function(t,n){n instanceof v&&"load"===t[0]&&d.emit("xhr-load-removed",[t[1],t[2]],n)}),d.on("fn-start",function(t,n,e){n instanceof v&&("onload"===e&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=s.now()))}),d.on("fn-end",function(t,n){this.xhrCbStart&&d.emit("xhr-cb-time",[s.now()-this.xhrCbStart,this.onload,n],n)}),d.on("fetch-before-start",function(t){var n,e=t[1]||{};"string"==typeof t[0]?n=t[0]:t[0]&&t[0].url&&(n=t[0].url),n&&(this.parsedOrigin=f(n),this.sameOrigin=this.parsedOrigin.sameOrigin);var r=u(this.parsedOrigin);if(r&&r.header){var o=r.header;if("string"==typeof t[0]){var i={};for(var a in e)i[a]=e[a];i.headers=new Headers(e.headers||{}),i.headers.set("newrelic",o),this.dt=r,t.length>1?t[1]=i:t.push(i)}else t[0]&&t[0].headers&&(t[0].headers.append("newrelic",o),this.dt=r)}})}},{}],13:[function(t,n,e){var r={};n.exports=function(t){if(t in r)return r[t];var n=document.createElement("a"),e=window.location,o={};n.href=t,o.port=n.port;var i=n.href.split("://");!o.port&&i[1]&&(o.port=i[1].split("/")[0].split("@").pop().split(":")[1]),o.port&&"0"!==o.port||(o.port="https"===i[0]?"443":"80"),o.hostname=n.hostname||e.hostname,o.pathname=n.pathname,o.protocol=i[0],"/"!==o.pathname.charAt(0)&&(o.pathname="/"+o.pathname);var a=!n.protocol||":"===n.protocol||n.protocol===e.protocol,s=n.hostname===document.domain&&n.port===e.port;return o.sameOrigin=a&&(!n.hostname||s),"/"===o.pathname&&(r[t]=o),o}},{}],14:[function(t,n,e){function r(){}function o(t,n,e){return function(){return i(t,[f.now()].concat(s(arguments)),n?null:this,e),n?void 0:this}}var i=t("handle"),a=t(20),s=t(21),c=t("ee").get("tracer"),f=t("loader"),u=NREUM;"undefined"==typeof window.newrelic&&(newrelic=u);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",p=l+"ixn-";a(d,function(t,n){u[n]=o(l+n,!0,"api")}),u.addPageAction=o(l+"addPageAction",!0),u.setCurrentRouteName=o(l+"routeName",!0),n.exports=newrelic,u.interaction=function(){return(new r).get()};var h=r.prototype={createTracer:function(t,n){var e={},r=this,o="function"==typeof n;return i(p+"tracer",[f.now(),t,e],r),function(){if(c.emit((o?"":"no-")+"fn-start",[f.now(),r,o],e),o)try{return n.apply(this,arguments)}catch(t){throw c.emit("fn-err",[arguments,this,t],e),t}finally{c.emit("fn-end",[f.now()],e)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(t,n){h[n]=o(p+n)}),newrelic.noticeError=function(t,n){"string"==typeof t&&(t=new Error(t)),i("err",[t,f.now(),!1,n])}},{}],15:[function(t,n,e){n.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(n){return}}}},{}],16:[function(t,n,e){var r=0,o=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);o&&(r=+o[1]),n.exports=r},{}],17:[function(t,n,e){function r(t,n){var e=t.getEntries();e.forEach(function(t){"first-paint"===t.name?a("timing",["fp",Math.floor(t.startTime)]):"first-contentful-paint"===t.name&&a("timing",["fcp",Math.floor(t.startTime)])})}function o(t){if(t instanceof c&&!u){var n,e=Math.round(t.timeStamp);n=e>1e12?Date.now()-e:s.now()-e,u=!0,a("timing",["fi",e,{type:t.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var i,a=t("handle"),s=t("loader"),c=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){i=new PerformanceObserver(r);try{i.observe({entryTypes:["paint"]})}catch(f){}}if("addEventListener"in document){var u=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(t){document.addEventListener(t,o,!1)})}}},{}],18:[function(t,n,e){function r(){function t(){return n?15&n[e++]:16*Math.random()|0}var n=null,e=0,r=window.crypto||window.msCrypto;r&&r.getRandomValues&&(n=r.getRandomValues(new Uint8Array(31)));for(var o,i="xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",a="",s=0;s<i.length;s++)o=i[s],"x"===o?a+=t().toString(16):"y"===o?(o=3&t()|8,a+=o.toString(16)):a+=o;return a}function o(){function t(){return n?15&n[e++]:16*Math.random()|0}var n=null,e=0,r=window.crypto||window.msCrypto;r&&r.getRandomValues&&Uint8Array&&(n=r.getRandomValues(new Uint8Array(31)));for(var o=[],i=0;i<16;i++)o.push(t().toString(16));return o.join("")}n.exports={generateUuid:r,generateCatId:o}},{}],19:[function(t,n,e){function r(t,n){if(!o)return!1;if(t!==o)return!1;if(!n)return!0;if(!i)return!1;for(var e=i.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==e[a])return!1;return!0}var o=null,i=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var s=navigator.userAgent,c=s.match(a);c&&s.indexOf("Chrome")===-1&&s.indexOf("Chromium")===-1&&(o="Safari",i=c[1])}n.exports={agent:o,version:i,match:r}},{}],20:[function(t,n,e){function r(t,n){var e=[],r="",i=0;for(r in t)o.call(t,r)&&(e[i]=n(r,t[r]),i+=1);return e}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],21:[function(t,n,e){function r(t,n,e){n||(n=0),"undefined"==typeof e&&(e=t?t.length:0);for(var r=-1,o=e-n||0,i=Array(o<0?0:o);++r<o;)i[r]=t[n+r];return i}n.exports=r},{}],22:[function(t,n,e){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(t,n,e){function r(){}function o(t){function n(t){return t&&t instanceof r?t:t?c(t,s,i):i()}function e(e,r,o,i){if(!l.aborted||i){t&&t(e,r,o);for(var a=n(o),s=m(e),c=s.length,f=0;f<c;f++)s[f].apply(a,r);var d=u[y[e]];return d&&d.push([x,e,r,a]),a}}function p(t,n){g[t]=m(t).concat(n)}function h(t,n){var e=g[t];if(e)for(var r=0;r<e.length;r++)e[r]===n&&e.splice(r,1)}function m(t){return g[t]||[]}function w(t){return d[t]=d[t]||o(e)}function v(t,n){f(t,function(t,e){n=n||"feature",y[e]=n,n in u||(u[n]=[])})}var g={},y={},x={on:p,addEventListener:p,removeEventListener:h,emit:e,get:w,listeners:m,context:n,buffer:v,abort:a,aborted:!1};return x}function i(){return new r}function a(){(u.api||u.feature)&&(l.aborted=!0,u=l.backlog={})}var s="nr@context",c=t("gos"),f=t(20),u={},d={},l=n.exports=o();l.backlog=u},{}],gos:[function(t,n,e){function r(t,n,e){if(o.call(t,n))return t[n];var r=e();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return t[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(t,n,e){function r(t,n,e,r){o.buffer([t],r),o.emit(t,n,e)}var o=t("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(t,n,e){function r(t){var n=typeof t;return!t||"object"!==n&&"function"!==n?-1:t===window?0:a(t,i,function(){return o++})}var o=1,i="nr@id",a=t("gos");n.exports=r},{}],loader:[function(t,n,e){function r(){if(!E++){var t=b.info=NREUM.info,n=p.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(t&&t.licenseKey&&t.applicationID&&n))return u.abort();f(y,function(n,e){t[n]||(t[n]=e)}),c("mark",["onload",a()+b.offset],null,"api");var e=p.createElement("script");e.src="https://"+t.agent,n.parentNode.insertBefore(e,n)}}function o(){"complete"===p.readyState&&i()}function i(){c("mark",["domContent",a()+b.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(s=Math.max((new Date).getTime(),s))-b.offset}var s=(new Date).getTime(),c=t("handle"),f=t(20),u=t("ee"),d=t(19),l=window,p=l.document,h="addEventListener",m="attachEvent",w=l.XMLHttpRequest,v=w&&w.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:w,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var g=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1158.min.js"},x=w&&v&&v[h]&&!/CriOS/.test(navigator.userAgent),b=n.exports={offset:s,now:a,origin:g,features:{},xhrWrappable:x,userAgent:d};t(14),t(17),p[h]?(p[h]("DOMContentLoaded",i,!1),l[h]("load",r,!1)):(p[m]("onreadystatechange",o),l[m]("onload",r)),c("mark",["firstbyte",s],null,"api");var E=0,O=t(22)},{}],"wrap-function":[function(t,n,e){function r(t){return!(t&&t instanceof Function&&t.apply&&!t[a])}var o=t("ee"),i=t(21),a="nr@original",s=Object.prototype.hasOwnProperty,c=!1;n.exports=function(t,n){function e(t,n,e,o){function nrWrapper(){var r,a,s,c;try{a=this,r=i(arguments),s="function"==typeof e?e(r,a):e||{}}catch(f){l([f,"",[r,a,o],s])}u(n+"start",[r,a,o],s);try{return c=t.apply(a,r)}catch(d){throw u(n+"err",[r,a,d],s),d}finally{u(n+"end",[r,a,c],s)}}return r(t)?t:(n||(n=""),nrWrapper[a]=t,d(t,nrWrapper),nrWrapper)}function f(t,n,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<n.length;c++)s=n[c],a=t[s],r(a)||(t[s]=e(a,f?s+o:o,i,s))}function u(e,r,o){if(!c||n){var i=c;c=!0;try{t.emit(e,r,o,n)}catch(a){l([a,e,r,o])}c=i}}function d(t,n){if(Object.defineProperty&&Object.keys)try{var e=Object.keys(t);return e.forEach(function(e){Object.defineProperty(n,e,{get:function(){return t[e]},set:function(n){return t[e]=n,n}})}),n}catch(r){l([r])}for(var o in t)s.call(t,o)&&(n[o]=t[o]);return n}function l(n){try{t.emit("internal-error",n)}catch(e){}}return t||(t=o),e.inPlace=f,e.flag=a,e}},{}]},{},["loader",2,12,4,3]);</script><script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"applicationTime":373,"beacon":"bam.nr-data.net","queueTime":1,"transactionName":"NQQGYUZWDUNSVUMPWQxOIkBaVBdZXFgYCUYHDwFRTBkAX0FTGQJcAw8DWlVHE0MdQ0QDRD0AEUFcWU1GWlNAFRgODgNcWmgFX0FbDQpZBQgKalVZB29BU1APRRYTBUFdWA1vVVlFCw==","errorBeacon":"bam.nr-data.net","agent":"","applicationID":"3343327","licenseKey":"1beac94c95","atts":"GUMRFw5MQUJWR0IDRRY+BUBAXzxESkZSRAxAFApUQUMLVV1CXgVXFgQAFxgVFkNWRGgPUkBbRntbWQYSHxRFA0cXBBdBa10URGxVWAldCwRGDxZZDEQeRFIXQwcSEFBQFU8SQVNGE1MRFTtAR1IRb1JRUghCQFtGeFtNClxfVxhTGFJBTGJdWQdfREUXKGJCUFQbBAxDZ1pYAVINQhlSAQ8XEUYJAQdIBktBI1BXXAwfAQYGVgZTUVUVcl4RVVVZT0kBUk9UFWRONFVRdVgWTyAOEBoCGVIeAhRKGw=="}</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  
+      <title>
+       Sign in or Register | edX
+      </title>
+  
+
+
+  
+
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/i18n/en/fe6ad605__djangojs.e37eef1ffc63.js"></script>
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/2c04f5e8__ie11_find_array.bd1c6dc7a133.js"></script>
+
+  <link rel="icon" type="image/x-icon" href="../prod-edxapp.edx-cdn.org/static/edx.org/images/4167dd1e__favicon.9028de6ff678.ico">
+
+  
+  
+
+    <link href="../prod-edxapp.edx-cdn.org/static/edx.org/css/ca4b7164__lms-style-vendor.7efc5b554ed0.css" rel="stylesheet" type="text/css">
+
+
+
+    
+  
+
+    <link href="../prod-edxapp.edx-cdn.org/static/edx.org/css/3d98ee17__lms-main-v1.831942d943f5.css" rel="stylesheet" type="text/css">
+
+
+
+
+    
+    <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/54235dc6__lms-base-vendor.188b06b0a06d.js" charset="utf-8"></script>
+
+
+    
+    <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/276372c7__lms-base-application.2062f84b79fa.js" charset="utf-8"></script>
+
+
+
+  
+    
+    
+    <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/bundles/d9c83d15__commons.801589415513856312d1.e975e6e782cd.js"></script>
+
+
+
+  <script>
+    window.baseUrl = "https://prod\u002Dedxapp.edx\u002Dcdn.org/static/";
+    (function (require) {
+      require.config({
+          baseUrl: window.baseUrl
+      });
+    }).call(this, require || RequireJS.require);
+  </script>
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/lms/js/a5aef4c9__require-config.38226099c6ad.js"></script>
+  
+    <script type="text/javascript">
+        (function (require) {
+          require.config({
+              paths: {
+                'draggabilly': 'js/vendor/draggabilly.26caba6f7187',
+'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events',
+'js/student_account/logistration_factory': 'js/student_account/logistration_factory.6890e9ae9bc6',
+'js/courseware/course_info_events': 'js/courseware/course_info_events.2fc35b57627f',
+'js/dateutil_factory': 'js/dateutil_factory.be68acdff619',
+'moment-timezone': 'common/js/vendor/moment-timezone-with-data.60142e6c4416',
+'moment': 'common/js/vendor/moment-with-locales.43ec67e44612',
+'js/views/message_banner': 'js/views/message_banner.bc5a1361d5f5',
+'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.d4cfaf3361fa',
+'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.d5f10bc65ed0',
+'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.2e10d9097343',
+'js/courseware/courseware_factory': 'js/courseware/courseware_factory.1504fc10caef',
+'hls': 'common/js/vendor/hls.8f15a0109b05',
+'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.7f46663f97b4',
+'js/courseware/accordion_events': 'js/courseware/accordion_events.6064c7809de5'
+            }
+          });
+        }).call(this, require || RequireJS.require);
+    </script>
+  
+
+  
+  
+
+  
+
+
+  
+
+
+<script type="application/json" id="user-metadata">
+    {"course_start": null, "has_non_audit_enrollments": null, "course_id": null, "enrollment_mode": null, "program_key_fields": null, "username": "", "user_id": null, "course_duration": null, "upgrade_link": null, "course_end": null, "partition_groups": null, "course_upgrade_deadline": null, "schedule_start": null, "pacing_type": null, "has_staff_access": null, "enrollment_time": null, "audit_access_deadline": null, "forum_roles": null, "upgrade_price": null, "dynamic_upgrade_deadline": null}
+</script>
+
+  
+
+  
+
+<script src="../www.edx.org/optimizelyjs/79981458__1743970571.js"></script>
+
+  
+
+
+<!-- begin Segment -->
+<script type="text/javascript">
+  // Asynchronously load Segment's analytics.js library
+  !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+  analytics.load("8fncv13bt5");
+  analytics.page();
+  }}();
+  // Note: user tracking moved to segment-io-footer.html
+</script>
+<!-- end Segment -->
+
+
+  <meta name="path_prefix" content="">
+  
+    <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY">
+
+  <meta name="openedx-release-line" content="master">
+
+
+
+
+    <script type="text/javascript">
+        (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
+        branch.init('key_live_mfvq10qtrE7sjWpz2NHVNlnfrqamuY8u');
+    </script>
+
+</head>
+
+<body class="ltr  lang_en">
+
+
+<div id="page-prompt"></div>
+  <div class="window-wrap" dir="ltr">
+    
+    <a class="nav-skip sr-only sr-only-focusable" href="#main">Skip to main content</a>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="global-header ">
+        
+    
+
+    <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/bundles/804e4d75__CookiePolicyBanner.ddb8785476c52c5eabc8.0e1b34e85a92.js"></script>
+    <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/bundles/11682684__ReactRenderer.22d478a3e2bdfb8bdd0c.aca4ea9b1784.js"></script>
+
+    <div id="frontend-component-cookie-policy-banner"></div>
+    <script type="text/javascript">
+      var c;
+      try { c = CookiePolicyBanner; } catch (e) { c = null; }
+      new ReactRenderer({
+        component: c,
+        selector: '#frontend-component-cookie-policy-banner',
+        componentName: 'CookiePolicyBanner',
+        props: {}
+      });
+    </script>
+
+    <div class="main-header">
+        
+
+
+
+
+
+<h1 class="header-logo">
+  <a href="./da7c0cc0__dashboard.html">
+    
+    <img class="logo" src="../prod-edxapp.edx-cdn.org/static/edx.org/images/b49b4db1__logo.790c9a5340cb.png" alt="edX Home Page">
+    
+  </a>
+</h1>
+
+        <div class="hamburger-menu" role="button" aria-label="Options" menu aria-expanded="false" aria-controls="mobile-menu" tabindex="0">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+            
+
+
+
+
+
+
+
+
+<nav class="nav-links" aria-label="Sign in">
+  <div class="secondary">
+    <div>
+    </div>
+  </div>
+</nav>
+
+    </div>
+    <div class="mobile-menu hidden" aria-label="More" options role="menu" id="mobile-menu"></div>
+</header>
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    <div class="marketing-hero"></div>
+
+    <div class="content-wrapper main-container" id="content" dir="ltr">
+      
+
+
+
+
+
+
+
+
+
+
+        <script type="text/template" id="account-tpl">
+            <form id="email-change-form" method="post">
+    <label for="new-email"><%- gettext("New Address") %></label>
+    <input id="new-email" type="text" name="new-email" value="" placeholder="xsy@edx.org" data-validate="required email"/>
+    <div id="new-email-status" />
+
+    <label for="password"><%- gettext("Password") %></label>
+    <input id="password" type="password" name="password" value="" data-validate="required"/>
+    <div id="password-status" />
+
+    <div class="submit-button">
+        <input type="submit" id="email-change-submit" value="<%- gettext("Change My Email Address") %>">
+    </div>
+    <div id="request-email-status" />
+
+    <div id="password-reset">
+        <button type="button"><%- gettext("Reset Password") %></button>
+    </div>
+    <div id="password-reset-status" />
+</form>
+
+        </script>
+        <script type="text/template" id="access-tpl">
+            <section id="login-anchor" class="form-type">
+    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
+</section>
+
+<section id="register-anchor" class="form-type">
+    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
+</section>
+
+<section id="password-reset-anchor" class="form-type">
+    <div id="password-reset-form" class="form-wrapper hidden"></div>
+</section>
+
+<section id="institution_login-anchor" class="form-type">
+    <div id="institution_login-form" class="form-wrapper hidden"></div>
+</section>
+
+<section id="hinted-login-anchor" class="form-type">
+    <div id="hinted-login-form" class="form-wrapper <% if ( mode !== 'hinted_login' ) { %>hidden<% } %>"></div>
+</section>
+
+        </script>
+        <script type="text/template" id="form_field-tpl">
+            <div class="form-field <%- type %>-<%- name %>">
+    <% if ( type !== 'checkbox' && type !== 'plaintext') { %>
+        <label for="<%- form %>-<%- name %>">
+            <span class="label-text"><%- label %></span>
+            <% if ( required && type !== 'hidden' ) { %>
+                <span id="<%- form %>-<%- name %>-required-label"
+                    class="label-required <% if ( !requiredStr ) { %>hidden<% } %>">
+                    <% if ( requiredStr ) { %><%- requiredStr %><% }%>
+                </span>
+                <span class="icon fa" id="<%- form %>-<%- name %>-validation-icon" aria-hidden="true"></span>
+            <% } %>
+            <% if ( !required && optionalStr && (type !== 'hidden') ) { %>
+                <span class="label-optional" id="<%- form %>-<%- name %>-optional-label"><%- optionalStr %></span>
+            <% } %>
+        </label>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
+            </div>
+        <% } %>
+    <% } %>
+
+    <% if ( type === 'select' ) { %>
+        <select id="<%- form %>-<%- name %>"
+            name="<%- name %>"
+            class="input-inline"
+            <% if ( instructions ) { %>
+            aria-describedby="<%- form %>-<%- name %>-desc <%- form %>-<%- name %>-validation-error"
+            <% } %>
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%- type %>="<%- msg %>"
+            <%  });
+            } %>
+            <% if ( required ) { %> aria-required="true" required<% } %>
+        >
+            <% _.each(options, function(el) { %>
+                <option value="<%- el.value%>"<% if ( el.default ) { %> data-isdefault="true" selected<% } %>><%- el.name %></option>
+            <% }); %>
+        </select>
+        <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
+            <span class="sr-only"></span>
+            <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
+        </span>
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
+            </div>
+        <% } %>
+    <% } else if ( type === 'textarea' ) { %>
+        <textarea id="<%- form %>-<%- name %>"
+            type="<%- type %>"
+            name="<%- name %>"
+            class="input-block"
+            <% if ( instructions ) { %>
+            aria-describedby="<%- form %>-<%- name %>-desc <%- form %>-<%- name %>-validation-error"
+            <% } %>
+            <% if ( restrictions.min_length ) { %> minlength="<%- restrictions.min_length %>"<% } %>
+            <% if ( restrictions.max_length ) { %> maxlength="<%- restrictions.max_length %>"<% } %>
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%- type %>="<%- msg %>"
+            <%  });
+            } %>
+            <% if ( required ) { %> aria-required="true" required<% } %>></textarea>
+        <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
+            <span class="sr-only"></span>
+            <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
+        </span>
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
+            </div>
+        <% } %>
+    <% } else if (type === 'plaintext' ) { %>
+            <span class="plaintext-field"><%= HtmlUtils.HTML(label) %></span>
+            <input id="<%- form %>-<%- name %>"
+               type="hidden"
+               name="<%- name %>"
+               class="input-block"
+               value="true"
+            />
+    <% } else { %>
+        <% if ( type === 'checkbox' ) { %>
+            <% if (supplementalLink && supplementalText) { %>
+                <div class="supplemental-link">
+                    <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
+                </div>
+            <% } %>
+        <% } %>
+        <input id="<%- form %>-<%- name %>"
+           type="<%- type %>"
+           name="<%- name %>"
+           class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>"
+            <% if ( instructions ) { %>
+            aria-describedby="<%- form %>-<%- name %>-desc <%- form %>-<%- name %>-validation-error"
+            <% } %>
+            <% if ( restrictions.min_length ) { %> minlength="<%- restrictions.min_length %>"<% } %>
+            <% if ( restrictions.max_length ) { %> maxlength="<%- restrictions.max_length %>"<% } %>
+            <% if ( restrictions.readonly )   { %> readonly <% } %>
+            <% if ( required ) { %> required<% } %>
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%- type %>="<%- msg %>"
+            <%  });
+            } %>
+            <% if ( placeholder ) { %> placeholder="<%- placeholder %>"<% } %>
+            value="<%- defaultValue %>"
+        />
+        <% if ( type === 'checkbox' ) { %>
+            <label for="<%- form %>-<%- name %>">
+                <span class="label-text"><%= HtmlUtils.HTML(label) %></span>
+                <% if ( required && type !== 'hidden' ) { %>
+                    <span id="<%- form %>-<%- name %>-required-label"
+                        class="label-required <% if ( !requiredStr ) { %>hidden<% } %>">
+                        <% if ( requiredStr ) { %><%- requiredStr %><% }%>
+                    </span>
+                    <span class="icon fa" id="<%- form %>-<%- name %>-validation-icon" aria-hidden="true"></span>
+                <% } %>
+                <% if ( !required && optionalStr ) { %>
+                    <span class="label-optional" id="<%- form %>-<%- name %>-optional-label"><%- optionalStr %></span>
+                <% } %>
+            </label>
+        <% } %>
+
+        <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
+            <span class="sr-only"></span>
+            <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
+        </span>
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
+    <% } %>
+
+    <% if( form === 'login' && name === 'password' ) { %>
+        <button type="button" class="forgot-password field-link"><%- gettext("Need help logging in?") %></button>
+    <% } %>
+</div>
+
+        </script>
+        <script type="text/template" id="login-tpl">
+            <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
+</div>
+
+<% if ( context.createAccountOption !== false && !context.syncLearnerProfileData && !(context.enterpriseName && context.currentProvider) ) { %>
+<div class="toggle-form">
+    <span class="text"><%- gettext("First time here?") %></span>
+    <a href="#login" class="form-toggle" data-type="register"><%- gettext("Create an Account.") %></a>
+</div>
+<% } %>
+
+<% // Hide SSO related messages if we are not in the SSO pipeline.  %>
+<% if (context.enterpriseName && context.currentProvider) { %>
+    <% if (context.pipelineUserDetails && context.pipelineUserDetails.email) { %>
+        <h2><%- gettext("Sign in to continue learning as {email}").replace("{email}", context.pipelineUserDetails.email) %></h2>
+    <% } else { %>
+        <h2><%- gettext("Sign in to continue learning") %></h2>
+    <% } %>
+    <p>
+        <%- gettext("You already have an edX account with your {enterprise_name} email address.").replace(/{enterprise_name}/g, context.enterpriseName) %>
+        <% if (context.syncLearnerProfileData) {
+            %><%- gettext("Going forward, your account information will be updated and maintained by {enterprise_name}.").replace(/{enterprise_name}/g, context.enterpriseName) %>
+        <% } %>
+        <%- gettext("You can view your information or unlink from {enterprise_name} anytime in your Account Settings.").replace(/{enterprise_name}/g, context.enterpriseName) %>
+    </p>
+    <p><%- gettext("To continue learning with this account, sign in below.") %></p>
+<% } else { %>
+    <h2><%- gettext("Sign In") %></h2>
+<% } %>
+
+<form id="login" class="login-form" tabindex="-1" method="POST">
+
+    <p class="sr">
+        <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
+            <%- gettext("Sign in here using your email address and password, or use one of the providers listed below.") %>
+        <% } else { %>
+            <%- gettext("Sign in here using your email address and password.") %>
+        <% } %>
+        <%- gettext("If you do not yet have an account, use the button below to register.") %>
+    </p>
+
+    <% if ( context.hasSecondaryProviders ) { %>
+        <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+            <%- gettext("Use my university info") %>
+        </button>
+
+        <div class="section-title lines">
+            <h3>
+                <span class="text"><%- gettext("or sign in with") %></span>
+            </h3>
+        </div>
+    <% } %>
+
+    <%= HtmlUtils.HTML(context.fields) %>
+
+    <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
+
+    <% if ( context.providers.length > 0 && !context.currentProvider) { %>
+    <div class="login-providers">
+        <div class="section-title lines">
+            <h3>
+                <span class="text"><%- gettext("or sign in with") %></span>
+            </h3>
+        </div>
+
+        <% _.each( context.providers, function( provider ) {
+            if ( provider.loginUrl ) { %>
+                <button type="button" class="button button-primary button-<%- provider.id %> login-provider login-<%- provider.id %>" data-provider-url="<%- provider.loginUrl %>">
+                    <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
+                        <% if ( provider.iconImage ) { %>
+                            <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
+                        <% } %>
+                    </div>
+                    <span aria-hidden="true"><%- provider.name %></span>
+                    <span class="sr"><%- _.sprintf( gettext("Sign in with %(providerName)s"), {providerName: provider.name} ) %></span>
+                </button>
+            <% }
+        }); %>
+    </div>
+    <% } %>
+</form>
+
+
+        </script>
+        <script type="text/template" id="register-tpl">
+            <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
+</div>
+
+<% if (!context.syncLearnerProfileData) { %>
+	<div class="toggle-form">
+		<span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
+		<a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
+	</div>
+<% } %>
+
+<form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
+
+    <% if (!context.currentProvider) { %>
+        <% if (context.providers.length > 0 || context.hasSecondaryProviders) { %>
+            <div class="login-providers">
+                <div class="section-title lines">
+                    <h3>
+                        <span class="text"><%- gettext("Create an account using") %></span>
+                    </h3>
+                </div>
+                <%
+                _.each( context.providers, function( provider) {
+                    if ( provider.registerUrl ) { %>
+                        <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
+                            <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
+                                <% if ( provider.iconImage ) { %>
+                                    <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
+                                <% } %>
+                            </div>
+                            <span aria-hidden="true"><%- provider.name %></span>
+                            <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
+                        </button>
+                <%  }
+                }); %>
+
+                <% if ( context.hasSecondaryProviders ) { %>
+                    <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+                        <%- gettext("Use my institution/campus credentials") %>
+                    </button>
+                <% } %>
+            </div>
+            <div class="section-title lines">
+                <h3>
+                    <span class="text"><%- gettext("or create a new one here") %></span>
+                </h3>
+            </div>
+        <% } else { %>
+            <h2><%- gettext('Create an Account')%></h2>
+        <% } %>
+    <% } else if (context.autoRegisterWelcomeMessage) { %>
+        <span class="auto-register-message"><%- context.autoRegisterWelcomeMessage %></span>
+    <% } %>
+
+    <%= context.fields %>
+
+    <div class="form-field checkbox-optional_fields_toggle">
+        <input type="checkbox" id="toggle_optional_fields" class="input-block checkbox"">
+        <label for="toggle_optional_fields">
+            <span class="label-text">
+                <%- gettext("Support education research by providing additional information") %>
+            </span>
+        </label>
+    </div>
+
+
+    <button type="submit" class="action action-primary action-update js-register register-button">
+    	<% if ( context.registerFormSubmitButtonText ) { %><%- context.registerFormSubmitButtonText %><% } else { %><%- gettext("Create Account") %><% } %>
+    </button>
+</form>
+
+        </script>
+        <script type="text/template" id="institution_login-tpl">
+            <div class="wrapper-other-login">
+    <div class="section-title lines">
+        <h2>
+            <span class="text">
+                <%- gettext("Sign in with Institution/Campus Credentials") %>
+            </span>
+        </h2>
+    </div>
+
+    <p class="instructions"><%- gettext("Choose your institution from the list below:") %></p>
+
+    <ul class="institution-list">
+        <% _.each( _.sortBy(providers, "name"), function( provider ) {
+            if ( provider.loginUrl ) { %>
+                <li class="institution">
+                    <a class="institution-login-link" href="<%- provider.loginUrl %>"><%- provider.name %></a>
+                </li>
+            <% }
+        }); %>
+    </ul>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or") %></span>
+        </h2>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="login"><%- gettext("Back to sign in") %></button>
+    </div>
+</div>
+
+        </script>
+        <script type="text/template" id="institution_register-tpl">
+            <div class="wrapper-other-login">
+    <div class="section-title lines">
+        <h2>
+            <span class="text">
+                <%- gettext("Register with Institution/Campus Credentials") %>
+            </span>
+        </h2>
+    </div>
+
+    <p class="instructions"><%- gettext("Choose your institution from the list below:") %></p>
+
+    <ul class="institution-list">
+        <% _.each( _.sortBy(providers, "name"), function( provider ) {
+            if ( provider.registerUrl ) { %>
+                <li class="institution">
+                    <a class="institution-login-link" href="<%- provider.registerUrl %>"><%- provider.name %></a>
+                </li>
+            <% }
+        }); %>
+    </ul>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or") %></span>
+        </h2>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an Account") %></button>
+    </div>
+</div>
+
+        </script>
+        <script type="text/template" id="password_reset-tpl">
+            <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
+</div>
+
+<h2><%- gettext("Password assistance") %></h2>
+
+<form id="password-reset" class="password-reset-form" tabindex="-1" method="POST">
+
+    <p class="action-label"><%- gettext("Please enter your log-in or recovery email address below and we will send you an email with instructions.") %></p>
+
+    <%= HtmlUtils.HTML(fields) %>
+
+    <button type="submit" class="action action-primary action-update js-reset"><%- gettext("Recover my password") %></button>
+</form>
+
+        </script>
+        <script type="text/template" id="hinted_login-tpl">
+            <div class="wrapper-other-login">
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("Sign in") %></span>
+        </h2>
+    </div>
+
+    <p class="instructions"><%- _.sprintf( gettext("Would you like to sign in using your %(providerName)s credentials?"), { providerName: hintedProvider.name } ) %></p>
+
+    <button class="action action-primary action-update proceed-button button-<%- hintedProvider.id %> hinted-login-<%- hintedProvider.id %>">
+        <span class="icon <% if ( hintedProvider.iconClass ) { %>fa <%- hintedProvider.iconClass %><% } %>" aria-hidden="true">
+            <% if ( hintedProvider.iconImage ) { %>
+                <img class="icon-image" src="<%- hintedProvider.iconImage %>" alt="<%- hintedProvider.name %> icon" />
+            <% } %>
+        </span>
+        <%- _.sprintf( gettext("Sign in using %(providerName)s"), { providerName: hintedProvider.name } ) %>
+    </button>
+
+    <div class="section-title lines">
+        <h2>
+            <span class="text"><%- gettext("or") %></span>
+        </h2>
+    </div>
+
+    <div class="toggle-form">
+        <button class="nav-btn form-toggle" data-type="login"><%- gettext("Show me other ways to sign in or register") %></button>
+    </div>
+</div>
+
+        </script>
+
+<div class="section-bkg-wrapper">
+    <main id="main" aria-label="Content" tabindex="-1">
+        <div id="content-container" class="login-register-content">
+                
+            <div id="login-and-registration-container" class="login-register "></div>
+        </div>
+    </main>
+</div>
+
+      
+    </div>
+
+
+  </div>
+
+  
+  
+    
+    
+      <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/student_account/a5e6a3c4__logistration_factory.6890e9ae9bc6.js"></script>
+    <script type="text/javascript">
+        (function (require) {
+            require(['js/student_account/logistration_factory'], function (LogistrationFactory) {
+                
+        var options = {"platform_name": "edX", "password_reset_support_link": "https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-", "account_activation_messages": [], "account_creation_allowed": true, "password_reset_form_desc": {"method": "post", "submit_url": "/account/password", "fields": [{"errorMessages": {}, "label": "Email", "required": true, "defaultValue": "", "name": "email", "type": "email", "supplementalLink": "", "instructions": "The email address you used to register with edX", "placeholder": "username@domain.com", "supplementalText": "", "restrictions": {"max_length": 254, "min_length": 3}}]}, "is_account_recovery_feature_enabled": true, "login_redirect_url": "/dashboard", "registration_form_desc": {"method": "post", "submit_url": "/user_api/v1/account/registration/", "fields": [{"errorMessages": {}, "label": "Email", "required": true, "defaultValue": "", "name": "email", "type": "email", "supplementalLink": "", "instructions": "This is what you will use to login.", "placeholder": "", "supplementalText": "", "restrictions": {"max_length": 254, "min_length": 3}}, {"errorMessages": {}, "label": "Full Name", "required": true, "defaultValue": "", "name": "name", "type": "text", "supplementalLink": "", "instructions": "This name will be used on any certificates that you earn.", "placeholder": "", "supplementalText": "", "restrictions": {"max_length": 255}}, {"errorMessages": {}, "label": "Public Username", "required": true, "defaultValue": "", "name": "username", "type": "text", "supplementalLink": "", "instructions": "The name that will identify you in your courses. It cannot be changed later.", "placeholder": "", "supplementalText": "", "restrictions": {"max_length": 30, "min_length": 2}}, {"errorMessages": {}, "label": "Password", "required": true, "defaultValue": "", "name": "password", "type": "password", "supplementalLink": "", "instructions": "Your password must contain at least 8 characters, including 1 letter \u0026 1 number.", "placeholder": "", "supplementalText": "", "restrictions": {"min_alphabetic": 1, "min_numeric": 1, "max_length": 100, "min_length": 8}}, {"options": [{"value": "", "name": "--", "default": true}, {"value": "AF", "name": "Afghanistan", "default": false}, {"value": "AX", "name": "\u00c5land Islands", "default": false}, {"value": "AL", "name": "Albania", "default": false}, {"value": "DZ", "name": "Algeria", "default": false}, {"value": "AS", "name": "American Samoa", "default": false}, {"value": "AD", "name": "Andorra", "default": false}, {"value": "AO", "name": "Angola", "default": false}, {"value": "AI", "name": "Anguilla", "default": false}, {"value": "AQ", "name": "Antarctica", "default": false}, {"value": "AG", "name": "Antigua and Barbuda", "default": false}, {"value": "AR", "name": "Argentina", "default": false}, {"value": "AM", "name": "Armenia", "default": false}, {"value": "AW", "name": "Aruba", "default": false}, {"value": "AU", "name": "Australia", "default": false}, {"value": "AT", "name": "Austria", "default": false}, {"value": "AZ", "name": "Azerbaijan", "default": false}, {"value": "BS", "name": "Bahamas", "default": false}, {"value": "BH", "name": "Bahrain", "default": false}, {"value": "BD", "name": "Bangladesh", "default": false}, {"value": "BB", "name": "Barbados", "default": false}, {"value": "BY", "name": "Belarus", "default": false}, {"value": "BE", "name": "Belgium", "default": false}, {"value": "BZ", "name": "Belize", "default": false}, {"value": "BJ", "name": "Benin", "default": false}, {"value": "BM", "name": "Bermuda", "default": false}, {"value": "BT", "name": "Bhutan", "default": false}, {"value": "BO", "name": "Bolivia", "default": false}, {"value": "BQ", "name": "Bonaire, Sint Eustatius and Saba", "default": false}, {"value": "BA", "name": "Bosnia and Herzegovina", "default": false}, {"value": "BW", "name": "Botswana", "default": false}, {"value": "BV", "name": "Bouvet Island", "default": false}, {"value": "BR", "name": "Brazil", "default": false}, {"value": "IO", "name": "British Indian Ocean Territory", "default": false}, {"value": "BN", "name": "Brunei", "default": false}, {"value": "BG", "name": "Bulgaria", "default": false}, {"value": "BF", "name": "Burkina Faso", "default": false}, {"value": "BI", "name": "Burundi", "default": false}, {"value": "CV", "name": "Cabo Verde", "default": false}, {"value": "KH", "name": "Cambodia", "default": false}, {"value": "CM", "name": "Cameroon", "default": false}, {"value": "CA", "name": "Canada", "default": false}, {"value": "KY", "name": "Cayman Islands", "default": false}, {"value": "CF", "name": "Central African Republic", "default": false}, {"value": "TD", "name": "Chad", "default": false}, {"value": "CL", "name": "Chile", "default": false}, {"value": "CN", "name": "China", "default": false}, {"value": "CX", "name": "Christmas Island", "default": false}, {"value": "CC", "name": "Cocos (Keeling) Islands", "default": false}, {"value": "CO", "name": "Colombia", "default": false}, {"value": "KM", "name": "Comoros", "default": false}, {"value": "CG", "name": "Congo", "default": false}, {"value": "CD", "name": "Congo (the Democratic Republic of the)", "default": false}, {"value": "CK", "name": "Cook Islands", "default": false}, {"value": "CR", "name": "Costa Rica", "default": false}, {"value": "CI", "name": "C\u00f4te d'Ivoire", "default": false}, {"value": "HR", "name": "Croatia", "default": false}, {"value": "CU", "name": "Cuba", "default": false}, {"value": "CW", "name": "Cura\u00e7ao", "default": false}, {"value": "CY", "name": "Cyprus", "default": false}, {"value": "CZ", "name": "Czechia", "default": false}, {"value": "DK", "name": "Denmark", "default": false}, {"value": "DJ", "name": "Djibouti", "default": false}, {"value": "DM", "name": "Dominica", "default": false}, {"value": "DO", "name": "Dominican Republic", "default": false}, {"value": "EC", "name": "Ecuador", "default": false}, {"value": "EG", "name": "Egypt", "default": false}, {"value": "SV", "name": "El Salvador", "default": false}, {"value": "GQ", "name": "Equatorial Guinea", "default": false}, {"value": "ER", "name": "Eritrea", "default": false}, {"value": "EE", "name": "Estonia", "default": false}, {"value": "SZ", "name": "Eswatini", "default": false}, {"value": "ET", "name": "Ethiopia", "default": false}, {"value": "FK", "name": "Falkland Islands  [Malvinas]", "default": false}, {"value": "FO", "name": "Faroe Islands", "default": false}, {"value": "FJ", "name": "Fiji", "default": false}, {"value": "FI", "name": "Finland", "default": false}, {"value": "FR", "name": "France", "default": false}, {"value": "GF", "name": "French Guiana", "default": false}, {"value": "PF", "name": "French Polynesia", "default": false}, {"value": "TF", "name": "French Southern Territories", "default": false}, {"value": "GA", "name": "Gabon", "default": false}, {"value": "GM", "name": "Gambia", "default": false}, {"value": "GE", "name": "Georgia", "default": false}, {"value": "DE", "name": "Germany", "default": false}, {"value": "GH", "name": "Ghana", "default": false}, {"value": "GI", "name": "Gibraltar", "default": false}, {"value": "GR", "name": "Greece", "default": false}, {"value": "GL", "name": "Greenland", "default": false}, {"value": "GD", "name": "Grenada", "default": false}, {"value": "GP", "name": "Guadeloupe", "default": false}, {"value": "GU", "name": "Guam", "default": false}, {"value": "GT", "name": "Guatemala", "default": false}, {"value": "GG", "name": "Guernsey", "default": false}, {"value": "GN", "name": "Guinea", "default": false}, {"value": "GW", "name": "Guinea-Bissau", "default": false}, {"value": "GY", "name": "Guyana", "default": false}, {"value": "HT", "name": "Haiti", "default": false}, {"value": "HM", "name": "Heard Island and McDonald Islands", "default": false}, {"value": "VA", "name": "Holy See", "default": false}, {"value": "HN", "name": "Honduras", "default": false}, {"value": "HK", "name": "Hong Kong", "default": false}, {"value": "HU", "name": "Hungary", "default": false}, {"value": "IS", "name": "Iceland", "default": false}, {"value": "IN", "name": "India", "default": false}, {"value": "ID", "name": "Indonesia", "default": false}, {"value": "IR", "name": "Iran", "default": false}, {"value": "IQ", "name": "Iraq", "default": false}, {"value": "IE", "name": "Ireland", "default": false}, {"value": "IM", "name": "Isle of Man", "default": false}, {"value": "IL", "name": "Israel", "default": false}, {"value": "IT", "name": "Italy", "default": false}, {"value": "JM", "name": "Jamaica", "default": false}, {"value": "JP", "name": "Japan", "default": false}, {"value": "JE", "name": "Jersey", "default": false}, {"value": "JO", "name": "Jordan", "default": false}, {"value": "KZ", "name": "Kazakhstan", "default": false}, {"value": "KE", "name": "Kenya", "default": false}, {"value": "KI", "name": "Kiribati", "default": false}, {"value": "XK", "name": "Kosovo", "default": false}, {"value": "KW", "name": "Kuwait", "default": false}, {"value": "KG", "name": "Kyrgyzstan", "default": false}, {"value": "LA", "name": "Laos", "default": false}, {"value": "LV", "name": "Latvia", "default": false}, {"value": "LB", "name": "Lebanon", "default": false}, {"value": "LS", "name": "Lesotho", "default": false}, {"value": "LR", "name": "Liberia", "default": false}, {"value": "LY", "name": "Libya", "default": false}, {"value": "LI", "name": "Liechtenstein", "default": false}, {"value": "LT", "name": "Lithuania", "default": false}, {"value": "LU", "name": "Luxembourg", "default": false}, {"value": "MO", "name": "Macao", "default": false}, {"value": "MG", "name": "Madagascar", "default": false}, {"value": "MW", "name": "Malawi", "default": false}, {"value": "MY", "name": "Malaysia", "default": false}, {"value": "MV", "name": "Maldives", "default": false}, {"value": "ML", "name": "Mali", "default": false}, {"value": "MT", "name": "Malta", "default": false}, {"value": "MH", "name": "Marshall Islands", "default": false}, {"value": "MQ", "name": "Martinique", "default": false}, {"value": "MR", "name": "Mauritania", "default": false}, {"value": "MU", "name": "Mauritius", "default": false}, {"value": "YT", "name": "Mayotte", "default": false}, {"value": "MX", "name": "Mexico", "default": false}, {"value": "FM", "name": "Micronesia (Federated States of)", "default": false}, {"value": "MD", "name": "Moldova", "default": false}, {"value": "MC", "name": "Monaco", "default": false}, {"value": "MN", "name": "Mongolia", "default": false}, {"value": "ME", "name": "Montenegro", "default": false}, {"value": "MS", "name": "Montserrat", "default": false}, {"value": "MA", "name": "Morocco", "default": false}, {"value": "MZ", "name": "Mozambique", "default": false}, {"value": "MM", "name": "Myanmar", "default": false}, {"value": "NA", "name": "Namibia", "default": false}, {"value": "NR", "name": "Nauru", "default": false}, {"value": "NP", "name": "Nepal", "default": false}, {"value": "NL", "name": "Netherlands", "default": false}, {"value": "NC", "name": "New Caledonia", "default": false}, {"value": "NZ", "name": "New Zealand", "default": false}, {"value": "NI", "name": "Nicaragua", "default": false}, {"value": "NE", "name": "Niger", "default": false}, {"value": "NG", "name": "Nigeria", "default": false}, {"value": "NU", "name": "Niue", "default": false}, {"value": "NF", "name": "Norfolk Island", "default": false}, {"value": "KP", "name": "North Korea", "default": false}, {"value": "MK", "name": "North Macedonia", "default": false}, {"value": "MP", "name": "Northern Mariana Islands", "default": false}, {"value": "NO", "name": "Norway", "default": false}, {"value": "OM", "name": "Oman", "default": false}, {"value": "PK", "name": "Pakistan", "default": false}, {"value": "PW", "name": "Palau", "default": false}, {"value": "PS", "name": "Palestine, State of", "default": false}, {"value": "PA", "name": "Panama", "default": false}, {"value": "PG", "name": "Papua New Guinea", "default": false}, {"value": "PY", "name": "Paraguay", "default": false}, {"value": "PE", "name": "Peru", "default": false}, {"value": "PH", "name": "Philippines", "default": false}, {"value": "PN", "name": "Pitcairn", "default": false}, {"value": "PL", "name": "Poland", "default": false}, {"value": "PT", "name": "Portugal", "default": false}, {"value": "PR", "name": "Puerto Rico", "default": false}, {"value": "QA", "name": "Qatar", "default": false}, {"value": "RE", "name": "R\u00e9union", "default": false}, {"value": "RO", "name": "Romania", "default": false}, {"value": "RU", "name": "Russia", "default": false}, {"value": "RW", "name": "Rwanda", "default": false}, {"value": "BL", "name": "Saint Barth\u00e9lemy", "default": false}, {"value": "SH", "name": "Saint Helena, Ascension and Tristan da Cunha", "default": false}, {"value": "KN", "name": "Saint Kitts and Nevis", "default": false}, {"value": "LC", "name": "Saint Lucia", "default": false}, {"value": "MF", "name": "Saint Martin (French part)", "default": false}, {"value": "PM", "name": "Saint Pierre and Miquelon", "default": false}, {"value": "VC", "name": "Saint Vincent and the Grenadines", "default": false}, {"value": "WS", "name": "Samoa", "default": false}, {"value": "SM", "name": "San Marino", "default": false}, {"value": "ST", "name": "Sao Tome and Principe", "default": false}, {"value": "SA", "name": "Saudi Arabia", "default": false}, {"value": "SN", "name": "Senegal", "default": false}, {"value": "RS", "name": "Serbia", "default": false}, {"value": "SC", "name": "Seychelles", "default": false}, {"value": "SL", "name": "Sierra Leone", "default": false}, {"value": "SG", "name": "Singapore", "default": false}, {"value": "SX", "name": "Sint Maarten (Dutch part)", "default": false}, {"value": "SK", "name": "Slovakia", "default": false}, {"value": "SI", "name": "Slovenia", "default": false}, {"value": "SB", "name": "Solomon Islands", "default": false}, {"value": "SO", "name": "Somalia", "default": false}, {"value": "ZA", "name": "South Africa", "default": false}, {"value": "GS", "name": "South Georgia and the South Sandwich Islands", "default": false}, {"value": "KR", "name": "South Korea", "default": false}, {"value": "SS", "name": "South Sudan", "default": false}, {"value": "ES", "name": "Spain", "default": false}, {"value": "LK", "name": "Sri Lanka", "default": false}, {"value": "SD", "name": "Sudan", "default": false}, {"value": "SR", "name": "Suriname", "default": false}, {"value": "SJ", "name": "Svalbard and Jan Mayen", "default": false}, {"value": "SE", "name": "Sweden", "default": false}, {"value": "CH", "name": "Switzerland", "default": false}, {"value": "SY", "name": "Syria", "default": false}, {"value": "TW", "name": "Taiwan", "default": false}, {"value": "TJ", "name": "Tajikistan", "default": false}, {"value": "TZ", "name": "Tanzania", "default": false}, {"value": "TH", "name": "Thailand", "default": false}, {"value": "TL", "name": "Timor-Leste", "default": false}, {"value": "TG", "name": "Togo", "default": false}, {"value": "TK", "name": "Tokelau", "default": false}, {"value": "TO", "name": "Tonga", "default": false}, {"value": "TT", "name": "Trinidad and Tobago", "default": false}, {"value": "TN", "name": "Tunisia", "default": false}, {"value": "TR", "name": "Turkey", "default": false}, {"value": "TM", "name": "Turkmenistan", "default": false}, {"value": "TC", "name": "Turks and Caicos Islands", "default": false}, {"value": "TV", "name": "Tuvalu", "default": false}, {"value": "UG", "name": "Uganda", "default": false}, {"value": "UA", "name": "Ukraine", "default": false}, {"value": "AE", "name": "United Arab Emirates", "default": false}, {"value": "GB", "name": "United Kingdom", "default": false}, {"value": "UM", "name": "United States Minor Outlying Islands", "default": false}, {"value": "US", "name": "United States of America", "default": false}, {"value": "UY", "name": "Uruguay", "default": false}, {"value": "UZ", "name": "Uzbekistan", "default": false}, {"value": "VU", "name": "Vanuatu", "default": false}, {"value": "VE", "name": "Venezuela", "default": false}, {"value": "VN", "name": "Vietnam", "default": false}, {"value": "VG", "name": "Virgin Islands (British)", "default": false}, {"value": "VI", "name": "Virgin Islands (U.S.)", "default": false}, {"value": "WF", "name": "Wallis and Futuna", "default": false}, {"value": "EH", "name": "Western Sahara", "default": false}, {"value": "YE", "name": "Yemen", "default": false}, {"value": "ZM", "name": "Zambia", "default": false}, {"value": "ZW", "name": "Zimbabwe", "default": false}], "required": true, "name": "country", "errorMessages": {"required": "Select your country or region of residence."}, "label": "Country or Region of Residence", "defaultValue": "", "type": "select", "supplementalLink": "", "instructions": "The country or region where you live.", "placeholder": "", "supplementalText": "", "restrictions": {}}, {"options": [{"value": "", "name": "--", "default": true}, {"value": "m", "name": "Male", "default": false}, {"value": "f", "name": "Female", "default": false}, {"value": "o", "name": "Other/Prefer Not to Say", "default": false}], "required": false, "name": "gender", "errorMessages": {}, "label": "Gender", "defaultValue": "", "type": "select", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {}}, {"options": [{"value": "", "name": "--", "default": true}, {"value": "2020", "name": "2020", "default": false}, {"value": "2019", "name": "2019", "default": false}, {"value": "2018", "name": "2018", "default": false}, {"value": "2017", "name": "2017", "default": false}, {"value": "2016", "name": "2016", "default": false}, {"value": "2015", "name": "2015", "default": false}, {"value": "2014", "name": "2014", "default": false}, {"value": "2013", "name": "2013", "default": false}, {"value": "2012", "name": "2012", "default": false}, {"value": "2011", "name": "2011", "default": false}, {"value": "2010", "name": "2010", "default": false}, {"value": "2009", "name": "2009", "default": false}, {"value": "2008", "name": "2008", "default": false}, {"value": "2007", "name": "2007", "default": false}, {"value": "2006", "name": "2006", "default": false}, {"value": "2005", "name": "2005", "default": false}, {"value": "2004", "name": "2004", "default": false}, {"value": "2003", "name": "2003", "default": false}, {"value": "2002", "name": "2002", "default": false}, {"value": "2001", "name": "2001", "default": false}, {"value": "2000", "name": "2000", "default": false}, {"value": "1999", "name": "1999", "default": false}, {"value": "1998", "name": "1998", "default": false}, {"value": "1997", "name": "1997", "default": false}, {"value": "1996", "name": "1996", "default": false}, {"value": "1995", "name": "1995", "default": false}, {"value": "1994", "name": "1994", "default": false}, {"value": "1993", "name": "1993", "default": false}, {"value": "1992", "name": "1992", "default": false}, {"value": "1991", "name": "1991", "default": false}, {"value": "1990", "name": "1990", "default": false}, {"value": "1989", "name": "1989", "default": false}, {"value": "1988", "name": "1988", "default": false}, {"value": "1987", "name": "1987", "default": false}, {"value": "1986", "name": "1986", "default": false}, {"value": "1985", "name": "1985", "default": false}, {"value": "1984", "name": "1984", "default": false}, {"value": "1983", "name": "1983", "default": false}, {"value": "1982", "name": "1982", "default": false}, {"value": "1981", "name": "1981", "default": false}, {"value": "1980", "name": "1980", "default": false}, {"value": "1979", "name": "1979", "default": false}, {"value": "1978", "name": "1978", "default": false}, {"value": "1977", "name": "1977", "default": false}, {"value": "1976", "name": "1976", "default": false}, {"value": "1975", "name": "1975", "default": false}, {"value": "1974", "name": "1974", "default": false}, {"value": "1973", "name": "1973", "default": false}, {"value": "1972", "name": "1972", "default": false}, {"value": "1971", "name": "1971", "default": false}, {"value": "1970", "name": "1970", "default": false}, {"value": "1969", "name": "1969", "default": false}, {"value": "1968", "name": "1968", "default": false}, {"value": "1967", "name": "1967", "default": false}, {"value": "1966", "name": "1966", "default": false}, {"value": "1965", "name": "1965", "default": false}, {"value": "1964", "name": "1964", "default": false}, {"value": "1963", "name": "1963", "default": false}, {"value": "1962", "name": "1962", "default": false}, {"value": "1961", "name": "1961", "default": false}, {"value": "1960", "name": "1960", "default": false}, {"value": "1959", "name": "1959", "default": false}, {"value": "1958", "name": "1958", "default": false}, {"value": "1957", "name": "1957", "default": false}, {"value": "1956", "name": "1956", "default": false}, {"value": "1955", "name": "1955", "default": false}, {"value": "1954", "name": "1954", "default": false}, {"value": "1953", "name": "1953", "default": false}, {"value": "1952", "name": "1952", "default": false}, {"value": "1951", "name": "1951", "default": false}, {"value": "1950", "name": "1950", "default": false}, {"value": "1949", "name": "1949", "default": false}, {"value": "1948", "name": "1948", "default": false}, {"value": "1947", "name": "1947", "default": false}, {"value": "1946", "name": "1946", "default": false}, {"value": "1945", "name": "1945", "default": false}, {"value": "1944", "name": "1944", "default": false}, {"value": "1943", "name": "1943", "default": false}, {"value": "1942", "name": "1942", "default": false}, {"value": "1941", "name": "1941", "default": false}, {"value": "1940", "name": "1940", "default": false}, {"value": "1939", "name": "1939", "default": false}, {"value": "1938", "name": "1938", "default": false}, {"value": "1937", "name": "1937", "default": false}, {"value": "1936", "name": "1936", "default": false}, {"value": "1935", "name": "1935", "default": false}, {"value": "1934", "name": "1934", "default": false}, {"value": "1933", "name": "1933", "default": false}, {"value": "1932", "name": "1932", "default": false}, {"value": "1931", "name": "1931", "default": false}, {"value": "1930", "name": "1930", "default": false}, {"value": "1929", "name": "1929", "default": false}, {"value": "1928", "name": "1928", "default": false}, {"value": "1927", "name": "1927", "default": false}, {"value": "1926", "name": "1926", "default": false}, {"value": "1925", "name": "1925", "default": false}, {"value": "1924", "name": "1924", "default": false}, {"value": "1923", "name": "1923", "default": false}, {"value": "1922", "name": "1922", "default": false}, {"value": "1921", "name": "1921", "default": false}, {"value": "1920", "name": "1920", "default": false}, {"value": "1919", "name": "1919", "default": false}, {"value": "1918", "name": "1918", "default": false}, {"value": "1917", "name": "1917", "default": false}, {"value": "1916", "name": "1916", "default": false}, {"value": "1915", "name": "1915", "default": false}, {"value": "1914", "name": "1914", "default": false}, {"value": "1913", "name": "1913", "default": false}, {"value": "1912", "name": "1912", "default": false}, {"value": "1911", "name": "1911", "default": false}, {"value": "1910", "name": "1910", "default": false}, {"value": "1909", "name": "1909", "default": false}, {"value": "1908", "name": "1908", "default": false}, {"value": "1907", "name": "1907", "default": false}, {"value": "1906", "name": "1906", "default": false}, {"value": "1905", "name": "1905", "default": false}, {"value": "1904", "name": "1904", "default": false}, {"value": "1903", "name": "1903", "default": false}, {"value": "1902", "name": "1902", "default": false}, {"value": "1901", "name": "1901", "default": false}], "required": false, "name": "year_of_birth", "errorMessages": {}, "label": "Year of birth", "defaultValue": "", "type": "select", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {}}, {"options": [{"value": "", "name": "--", "default": true}, {"value": "p", "name": "Doctorate", "default": false}, {"value": "m", "name": "Master's or professional degree", "default": false}, {"value": "b", "name": "Bachelor's degree", "default": false}, {"value": "a", "name": "Associate degree", "default": false}, {"value": "hs", "name": "Secondary/high school", "default": false}, {"value": "jhs", "name": "Junior secondary/junior high/middle school", "default": false}, {"value": "el", "name": "Elementary/primary school", "default": false}, {"value": "none", "name": "No formal education", "default": false}, {"value": "other", "name": "Other education", "default": false}], "required": false, "name": "level_of_education", "errorMessages": {"required": "Select the highest level of education you have completed."}, "label": "Highest level of education completed", "defaultValue": "", "type": "select", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {}}, {"errorMessages": {"required": "Tell us your goals."}, "label": "Tell us why you're interested in edX", "required": false, "defaultValue": "", "name": "goals", "type": "textarea", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {}}, {"errorMessages": {"required": "You must agree to the edX Terms of Service and Honor Code"}, "label": "By creating an account, you agree to the                   \u003ca href='https://www.edx.org/edx-terms-service' rel='noopener' target='_blank'\u003eTerms of Service and Honor Code\u003c/a\u003e                   and you acknowledge that edX and each Member process your personal data in accordance                   with the \u003ca href='https://www.edx.org/edx-privacy-policy' rel='noopener' target='_blank'\u003ePrivacy Policy\u003c/a\u003e.", "required": true, "defaultValue": false, "name": "honor_code", "type": "plaintext", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {}}]}, "support_link": "https://support.edx.org", "third_party_auth": {"pipeline_user_details": {}, "finishAuthUrl": null, "currentProvider": null, "errorMessage": null, "secondaryProviders": [], "syncLearnerProfileData": false, "providers": [{"iconClass": null, "registerUrl": "/auth/login/facebook/?auth_entry=register\u0026next=%2Fdashboard", "id": "oa2-facebook", "iconImage": "https://edxuploads.s3.amazonaws.com/flogo-HexRBG-Wht-58.svg", "loginUrl": "/auth/login/facebook/?auth_entry=login\u0026next=%2Fdashboard", "name": "Facebook"}, {"iconClass": null, "registerUrl": "/auth/login/google-oauth2/?auth_entry=register\u0026next=%2Fdashboard", "id": "oa2-google-oauth2", "iconImage": "https://edxuploads.s3.amazonaws.com/btn_google_light.svg", "loginUrl": "/auth/login/google-oauth2/?auth_entry=login\u0026next=%2Fdashboard", "name": "Google"}, {"iconClass": null, "registerUrl": "/auth/login/azuread-oauth2/?auth_entry=register\u0026next=%2Fdashboard", "id": "oa2-azuread-oauth2", "iconImage": "https://edxuploads.s3.amazonaws.com/MSFT-logo-only.png", "loginUrl": "/auth/login/azuread-oauth2/?auth_entry=login\u0026next=%2Fdashboard", "name": "Microsoft"}], "registerFormSubmitButtonText": "Create Account"}, "initial_mode": "login", "login_form_desc": {"method": "post", "submit_url": "/user_api/v1/account/login_session/", "fields": [{"errorMessages": {}, "label": "Email", "required": true, "defaultValue": "", "name": "email", "type": "email", "supplementalLink": "", "instructions": "The email address you used to register with edX", "placeholder": "username@domain.com", "supplementalText": "", "restrictions": {"max_length": 254, "min_length": 3}}, {"errorMessages": {}, "label": "Password", "required": true, "defaultValue": "", "name": "password", "type": "password", "supplementalLink": "", "instructions": "", "placeholder": "", "supplementalText": "", "restrictions": {"max_length": 5000}}]}, "third_party_auth_hint": "", "is_multiple_user_enterprises_feature_enabled": false, "account_recovery_messages": []};
+        LogistrationFactory(options);
+        if ('newrelic' in window) {
+            newrelic.finished();
+            // Because of a New Relic bug, the finished() event doesn't show up
+            // in Insights, so we have to make a new PageAction that is basically
+            // the same thing. We still want newrelic.finished() for session
+            // traces though.
+            newrelic.addPageAction('xfinished');
+        }
+    
+            });
+        }).call(this, require || RequireJS.require);
+    </script>
+
+
+
+  
+
+
+    <!-- begin segment footer -->
+    <script type="text/javascript">
+    </script>
+    <!-- end segment footer -->
+
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/vendor/e098b497__noreferrer.aa62a3e70ffa.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/utils/8c0b952c__navigation.08930e16ab3d.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/header/c3f65f6f__header.309a1243e175.js"></script>
+  
+  <script type="text/javascript" src="../prod-edxapp.edx-cdn.org/static/js/src/426a7475__jquery_extend_patch.54dddef28d15.js"></script>
+</body>
+</html>
