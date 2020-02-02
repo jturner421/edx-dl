@@ -3,8 +3,7 @@ from dataclasses import dataclass
 import pywebcopy
 from pywebcopy import save_webpage
 from bs4 import BeautifulSoup
-
-from edx_dl.edx_dl import EDX_HOMEPAGE
+import argparse
 
 
 def pyweb_login(url, headers, username, password, session):
@@ -18,7 +17,7 @@ def pyweb_login(url, headers, username, password, session):
     response = session.post(url, data=payload, headers=headers)
     return response
 
-def pywebcopy_get_headers(session, username, password):
+def pywebcopy_get_headers(session, username, password, login_url):
     """
     Build the Open edX headers to create future requests.
 
@@ -28,7 +27,7 @@ def pywebcopy_get_headers(session, username, password):
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)'
                              'Chrome/79.0.3945.88 Safari/537.36'}
-    session.get(EDX_HOMEPAGE, headers=headers)
+    session.get(login_url, headers=headers)
 
     csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
     headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
@@ -40,7 +39,7 @@ def pywebcopy_get_headers(session, username, password):
         'X-CSRFToken': csrftoken.value,
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
         'cookie': headers['cookie'],
-        'Referer': EDX_HOMEPAGE,
+        'Referer':login_url,
         'X-Requested-With': 'XMLHttpRequest'
     }
     logging.debug('PywebCopy Headers built: %s', headers)
@@ -83,10 +82,31 @@ def extract_course_hierachy(sub_sec,section_list):
     return section_list
 
 def main():
+    # args = parse_args()
+    #
+    #
+    # if not args.password:
+    #     args.password = getpass.getpass(stream=sys.stderr)
+    #
+    # if not args.username or not args.password:
+    #     logging.error("You must supply username and password to log-in")
+    #     exit(ExitCode.MISSING_CREDENTIALS)
+    username = 'jturner421@gmail.com'
+    password =  'durin7456'
+    LOGIN_API = 'https://courses.edx.org/login'
+    course_url = 'https://courses.edx.org/courses/course-v1:GTx+CS1301xII+3T2019/course/'
+    # Prepare PyWebCopy Headers
+    pyweb_session = pywebcopy.SESSION
+    pyweb_session_headers = pywebcopy_get_headers(pyweb_session, username, password, LOGIN_API)
+
+    # establish PyWebCopy Session
+    pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, username, password, pyweb_session)
+    # Login
     section_names_list = []
-    soup = BeautifulSoup(open('/Users/jwt/PycharmProjects/edx-dl/Downloaded/Course | CSS.0x | edX.html'), 'html.parser')
-    #sections = soup.find_all(class_='outline-item section')
-    #section_names_list = [value.h3.text for value in sections]
+    soup =pyweb_session.get(course_url)
+    # soup = BeautifulSoup(open('/Users/jwt/PycharmProjects/edx-dl/Downloaded/Course | CSS.0x | edX.html'), 'html.parser')
+    # sections = soup.find_all(class_='outline-item section')
+    # section_names_list = [value.h3.text for value in sections]
     sub_sec = soup.find_all(class_="subsection accordion")
     section_list = []
     course_urls = extract_course_hierachy(sub_sec, section_list)
