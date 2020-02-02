@@ -5,6 +5,7 @@ from pywebcopy import save_webpage
 from bs4 import BeautifulSoup
 import lxml
 import argparse
+import pathlib
 
 
 def pyweb_login(url, headers, username, password, session):
@@ -55,8 +56,9 @@ def save_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
     save_webpage(**kwargs)
 
 def extract_course_hierachy(sub_sec,section_list):
+    sub_sec_list = []
     for child in sub_sec:
-        sub_sec_list = []
+
         # section = child.find(class_='section_title')
         if child is not None:
             # for i in child.parents:
@@ -78,9 +80,9 @@ def extract_course_hierachy(sub_sec,section_list):
             sub_sec_list.append(sub_section_links)
         else:
             pass
-        section_dict = {section_name: sub_sec_list}
+        section_dict = {section_name: subsection_heading}
         section_list.append(section_dict)
-    return section_list
+    return section_list, sub_sec_list
 
 def main():
     username = 'jturner421@gmail.com'
@@ -90,18 +92,39 @@ def main():
     # Prepare PyWebCopy Headers
     pyweb_session = pywebcopy.SESSION
     pyweb_session_headers = pywebcopy_get_headers(pyweb_session, username, password, LOGIN_API)
-
+    base_output_path = ('/Volumes/home/CloudStation')
     # establish PyWebCopy Session
     pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, username, password, pyweb_session)
     # Login
     section_names_list = []
     page = pywebcopy.SESSION.get(course_url)
     soup = BeautifulSoup (page.text, 'lxml')
+    course_name = soup.find(class_= 'page-header-main').h2.text.strip()
+    course_name = course_name.replace(":", "").replace(" ", "_")
+    output_path = pathlib.Path(base_output_path).joinpath(course_name, '/')
 
-    sub_sec = soup.find_all(class_="subsection accordion")
+    sub_sec = soup.find_all(True, {"class":["subsection accordion", "subsection accordion graded scored"]})
     section_list = []
     course_urls = extract_course_hierachy(sub_sec, section_list)
-    print(section_list)
+
+
+    # get key
+    for sub_section in course_urls[0]:
+        for key in sub_section:
+            section_name = key
+            url_key = (sub_section[key])
+    # for index, value in enumerate(course_urls[0]):
+    #     url_dict_pos  = (index,value)
+    #     for sub_section_key in enumerate(value):
+    #         key = sub_section_key[1]
+    #         sub_section_dict = value[key]
+    #         for i, link_key in enumerate(sub_section_dict):
+    #             for get_link_key in enumerate(link_key):
+    #                 lkey = get_link_key[1]
+    #                 url_dict = sub_section_dict[0][lkey]
+    #                 for url in enumerate(url_dict):
+    #                     ukey = url[1]
+    #                     url_list = url_dict[0][ukey]
 
 if __name__ == '__main__':
     main()
