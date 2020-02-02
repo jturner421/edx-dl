@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
-
+import pywebcopy
+from pywebcopy import save_webpage
 from bs4 import BeautifulSoup
 
 from edx_dl.edx_dl import EDX_HOMEPAGE
@@ -45,6 +46,13 @@ def pywebcopy_get_headers(session, username, password):
     logging.debug('PywebCopy Headers built: %s', headers)
     return headers
 
+def save_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
+    kwargs = {'zip_project_folder': False,
+              'url': unit_url.unit_page_url,
+              'project_folder': target_dir,
+              'over_write': True
+              }
+    save_webpage(**kwargs)
 
 def extract_course_hierachy(sub_sec,section_list):
     for child in sub_sec:
