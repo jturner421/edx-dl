@@ -83,15 +83,6 @@ def extract_course_hierachy(sub_sec,section_list):
     return section_list
 
 def main():
-    # args = parse_args()
-    #
-    #
-    # if not args.password:
-    #     args.password = getpass.getpass(stream=sys.stderr)
-    #
-    # if not args.username or not args.password:
-    #     logging.error("You must supply username and password to log-in")
-    #     exit(ExitCode.MISSING_CREDENTIALS)
     username = 'jturner421@gmail.com'
     password =  'durin7456'
     LOGIN_API = 'https://courses.edx.org/login_ajax'
@@ -106,9 +97,7 @@ def main():
     section_names_list = []
     page = pywebcopy.SESSION.get(course_url)
     soup = BeautifulSoup (page.text, 'lxml')
-    # soup = BeautifulSoup(open('/Users/jwt/PycharmProjects/edx-dl/Downloaded/Course | CSS.0x | edX.html'), 'html.parser')
-    # sections = soup.find_all(class_='outline-item section')
-    # section_names_list = [value.h3.text for value in sections]
+
     sub_sec = soup.find_all(class_="subsection accordion")
     section_list = []
     course_urls = extract_course_hierachy(sub_sec, section_list)
