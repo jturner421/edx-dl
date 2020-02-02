@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import pywebcopy
 from pywebcopy import save_webpage
 from bs4 import BeautifulSoup
+import lxml
 import argparse
 
 
@@ -93,8 +94,8 @@ def main():
     #     exit(ExitCode.MISSING_CREDENTIALS)
     username = 'jturner421@gmail.com'
     password =  'durin7456'
-    LOGIN_API = 'https://courses.edx.org/login'
-    course_url = 'https://courses.edx.org/courses/course-v1:GTx+CS1301xII+3T2019/course/'
+    LOGIN_API = 'https://courses.edx.org/login_ajax'
+    course_url = 'https://courses.edx.org/courses/course-v1:Harvardx+HLS2X+1T2020/course/'
     # Prepare PyWebCopy Headers
     pyweb_session = pywebcopy.SESSION
     pyweb_session_headers = pywebcopy_get_headers(pyweb_session, username, password, LOGIN_API)
@@ -103,7 +104,8 @@ def main():
     pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, username, password, pyweb_session)
     # Login
     section_names_list = []
-    soup =pyweb_session.get(course_url)
+    page = pywebcopy.SESSION.get(course_url)
+    soup = BeautifulSoup (page.text, 'lxml')
     # soup = BeautifulSoup(open('/Users/jwt/PycharmProjects/edx-dl/Downloaded/Course | CSS.0x | edX.html'), 'html.parser')
     # sections = soup.find_all(class_='outline-item section')
     # section_names_list = [value.h3.text for value in sections]
