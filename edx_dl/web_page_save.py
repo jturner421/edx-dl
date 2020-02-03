@@ -1,11 +1,14 @@
 import logging
 from dataclasses import dataclass
+from operator import itemgetter
+
 import pywebcopy
 from pywebcopy import save_webpage
 from bs4 import BeautifulSoup
 import lxml
 import argparse
 import pathlib
+import os
 
 
 def pyweb_login(url, headers, username, password, session):
@@ -47,9 +50,9 @@ def pywebcopy_get_headers(session, username, password, login_url):
     logging.debug('PywebCopy Headers built: %s', headers)
     return headers
 
-def save_web_page(unit_url, args, target_dir, filename_prefix, pyweb_session):
+def save_web_page(url, target_dir, pyweb_session):
     kwargs = {'zip_project_folder': False,
-              'url': unit_url.unit_page_url,
+              'url': url,
               'project_folder': target_dir,
               'over_write': True
               }
@@ -59,13 +62,12 @@ def extract_course_hierachy(sub_sec,section_list):
     sub_sec_list = []
     for child in sub_sec:
 
-        # section = child.find(class_='section_title')
+
         if child is not None:
-            # for i in child.parents:
-            #     name = soup.find("h3")
+
             section_name = child.parent.parent.h3.text.strip()
+            section_name= section_name.replace(":", "").replace("-", "").replace(" ", "_")
             subsection_heading = child.h4.text.strip()
-            print(subsection_heading)
             links = child.find_all('a')
             link_list = []
             for link in links:
@@ -76,11 +78,11 @@ def extract_course_hierachy(sub_sec,section_list):
                     continue
                 l = {link_name: link_url}
                 link_list.append(l)
-            sub_section_links = {subsection_heading: link_list}
+            sub_section_links = {'subsection': subsection_heading, 'links':link_list}
             sub_sec_list.append(sub_section_links)
         else:
             pass
-        section_dict = {section_name: subsection_heading}
+        section_dict = {'section_name': section_name, 'subsection': subsection_heading}
         section_list.append(section_dict)
     return section_list, sub_sec_list
 
@@ -100,19 +102,41 @@ def main():
     page = pywebcopy.SESSION.get(course_url)
     soup = BeautifulSoup (page.text, 'lxml')
     course_name = soup.find(class_= 'page-header-main').h2.text.strip()
-    course_name = course_name.replace(":", "").replace(" ", "_")
-    output_path = pathlib.Path(base_output_path).joinpath(course_name, '/')
+    course_name = course_name.replace(":", "").replace("-", "").replace(" ", "_")
+    output_path = pathlib.Path(base_output_path).joinpath(course_name)
 
     sub_sec = soup.find_all(True, {"class":["subsection accordion", "subsection accordion graded scored"]})
     section_list = []
     course_urls = extract_course_hierachy(sub_sec, section_list)
-
-
+    # create master dictionary of urls for loookup
+    url_dict = dict((i['subsection'], i['links']) for i in course_urls[1])
+    # section_list_dict = dict((i['section_name'], i['subsections']) for i in course_urls[0])
+    # get output directories for course
+    file_list = []
+    for entry in os.scandir(output_path):
+        if entry.is_dir():
+            file_list.append(entry.name)
     # get key
     for sub_section in course_urls[0]:
-        for key in sub_section:
-            section_name = key
-            url_key = (sub_section[key])
+        section_name = sub_section['section_name']
+        url_key = sub_section['subsection']
+        # get course list
+        urls = url_dict[url_key]
+        save_path = next(section_name for section_name in file_list if section_name in section_name)
+        page_save_path = pathlib.Path(output_path).joinpath('web', save_path)
+        for index, url in enumerate(urls):
+            while index < 1:
+                for value in enumerate(url):
+                    k = (value[1])
+                    url = url[k]
+                    save_web_page(url, str(page_save_path), pyweb_session)
+
+
+
+
+        print(section_name)
+
+
     # for index, value in enumerate(course_urls[0]):
     #     url_dict_pos  = (index,value)
     #     for sub_section_key in enumerate(value):
