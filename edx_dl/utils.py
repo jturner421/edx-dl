@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # This module contains generic functions, ideally useful to any other module
-import re
-
-from bs4 import BeautifulSoup
 from six.moves.urllib.request import urlopen, Request
 from six.moves import html_parser
-import lxml
+
 import errno
 import json
 import logging
@@ -53,22 +50,20 @@ def directory_name(initial_name):
     return result if result != "" else "course_folder"
 
 
-def get_page_contents(url, headers):
+def get_page_contents(url, session):
     """
     Get the contents of the page at the URL given by url. While making the
     request, we use the headers given in the dictionary in headers.
     """
-    result = urlopen(Request(url, None, headers))
-    # soup = BeautifulSoup(result, features='lxml')
-    # section_name = soup.find(class_=re.compile('nav-item nav-item-section'))
-    try:
-        # for python3
-        charset = result.headers.get_content_charset(failobj="utf-8")
-    except:
-        charset = result.info().getparam('charset') or 'utf-8'
-
-    return result.read().decode(charset)
-
+    # result = urlopen(Request(url, None, headers))
+    result = session.get(url)
+    # try:
+    #     # for python3
+    #     charset = result.headers.get_content_charset(failobj="utf-8")
+    # except:
+    #     charset = result.info().getparam('charset') or 'utf-8'
+   # return result.read().decode(charset)
+    return result.text
 
 def get_page_contents_as_json(url, headers):
     """

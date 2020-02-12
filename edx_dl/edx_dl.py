@@ -14,13 +14,15 @@ import os
 import pickle
 import re
 import sys
+from lxml import html
+from requests_html import HTMLSession
+
+import pywebcopy
+import requests
 
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 
-import pywebcopy
-from pywebcopy import save_webpage
-from pywebcopy import WebPage, config
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlencode
@@ -40,7 +42,6 @@ from .common import (
     DEFAULT_CACHE_FILENAME,
     Unit,
     Video,
-    UnitUrl,
     ExitCode,
     DEFAULT_FILE_FORMATS,
 )
@@ -48,7 +49,6 @@ from .parsing import (
     edx_json2srt,
     get_page_extractor,
     is_youtube_url,
-    is_web_page_url,
 )
 from .utils import (
     clean_filename,
@@ -60,6 +60,7 @@ from .utils import (
     mkdir_p,
     remove_duplicates,
 )
+
 
 
 OPENEDX_SITES = {
@@ -101,8 +102,8 @@ OPENEDX_SITES = {
     }
 }
 BASE_URL = OPENEDX_SITES['edx']['url']
-EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session/'
-LOGIN_API = BASE_URL + '/login_ajax'
+# EDX_HOMEPAGE = BASE_URL + '/user_api/v1/account/login_session'
+LOGIN_API = BASE_URL + '/login'
 DASHBOARD = BASE_URL + '/dashboard'
 COURSEWARE_SEL = OPENEDX_SITES['edx']['courseware-selector']
 
@@ -140,13 +141,14 @@ def _display_courses(courses):
         logging.info('     %s', course.url)
 
 
-def get_courses_info(url, headers):
+def get_courses_info(url, session):
     """
     Extracts the courses information from the dashboard.
     """
     logging.info('Extracting course information from dashboard.')
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, session)
+
     page_extractor = get_page_extractor(url)
     courses = page_extractor.extract_courses_from_html(page, BASE_URL)
 
@@ -155,7 +157,7 @@ def get_courses_info(url, headers):
     return courses
 
 
-def _get_initial_token(url):
+def _get_initial_token(url, session):
     """
     Create initial connection to get authentication token for future
     requests.
@@ -166,27 +168,32 @@ def _get_initial_token(url):
     """
     logging.info('Getting initial CSRF token.')
 
-    cookiejar = CookieJar()
-    opener = build_opener(HTTPCookieProcessor(cookiejar))
-    install_opener(opener)
-    opener.open(url)
+    r = requests.get(url)
+    csrftoken = r.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in response.cookies])
+    # cookiejar = CookieJar()
+    # opener = build_opener(HTTPCookieProcessor(cookiejar))
+    # install_opener(opener)
+    # opener.open(url)
 
-    for cookie in cookiejar:
-        if cookie.name == 'csrftoken':
-            logging.info('Found CSRF token.')
-            return cookie.value
+    # for cookie in cookiejar:
+    #     if cookie.name == 'csrftoken':
+    #         logging.info('Found CSRF token.')
+    #         return cookie.value
+    if csrftoken:
+        return csrftoken.value
+    else:
+        logging.warn('Did not find the CSRF token.')
+        return ''
 
-    logging.warn('Did not find the CSRF token.')
-    return ''
 
-
-def get_available_sections(url, headers):
+def get_available_sections(url,session):
     """
     Extracts the sections and subsections from a given url
     """
     logging.debug("Extracting sections for :" + url)
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, session)
     page_extractor = get_page_extractor(url)
     sections = page_extractor.extract_sections_from_html(page, BASE_URL)
 
@@ -215,32 +222,38 @@ def edx_get_subtitle(url, headers,
         return None
 
 
-def edx_login(url, headers, username, password):
+def edx_login(url, username, password, session):
     """
     Log in user into the openedx website.
     """
+    logging.info('Building initial headers for future requests.')
+    logging.info('Getting initial CSRF token.')
+    headers = {}
+    session.get(BASE_URL)
+    csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
+    logging.debug('Headers built: %s', headers)
     logging.info('Logging into Open edX site: %s', url)
 
-    post_data = urlencode({'email': username,
-                           'password': password,
-                           'remember': False}).encode('utf-8')
+    payload = {'email': username, 'password': password}
+    headers = {
+        'X-CSRFToken': csrftoken.value,
+        'Referer': 'https://courses.edx.org/login',
+        'Host': 'courses.edx.org',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'cookie': headers['cookie'],
+        'Accept - Encoding': 'gzip, deflate, br',
+        'content-type': 'application/x-www-form-urlencoded',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,'
+                  'application/signed-exchange;v=b3;q=0.9'
+    }
 
-    request = Request(url, post_data, headers)
-    response = urlopen(request)
-    resp = json.loads(response.read().decode('utf-8'))
+    response = session.post(url, data=payload, headers=headers)
+    resp = response.status_code
 
     return resp
 
-def pyweb_login(url, headers, username, password, session):
-    """
-    Log in user into the openedx website for pywebcopy.
-    """
-    payload = {'email': username,
-               'password': password
-               }
-
-    response = session.post(url, data=payload, headers=headers)
-    return response
 
 def parse_args():
     """
@@ -425,66 +438,49 @@ def parse_args():
     return args
 
 
-def edx_get_headers():
+def edx_get_headers(session):
     """
     Build the Open edX headers to create future requests.
     """
     logging.info('Building initial headers for future requests.')
-
-    headers = {
-        'User-Agent': 'edX-downloader/0.01',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-        'Referer': EDX_HOMEPAGE,
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': _get_initial_token(EDX_HOMEPAGE),
-    }
-
-    logging.debug('Headers built: %s', headers)
-    return headers
-
-def pywebcopy_get_headers(session, username, password):
-    """
-    Build the Open edX headers to create future requests.
-
-    """
-    logging.info('Building Pywebcopy headers for future requests.')
+    logging.info('Getting initial CSRF token.')
 
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)'
-                             'Chrome/79.0.3945.88 Safari/537.36'}
+                             'Chrome/79.0.3945.88 Safari/537.36'
+               }
     session.get(EDX_HOMEPAGE, headers=headers)
-
     csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
     headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
 
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/79.0.3945.88 Safari/537.36',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'X-CSRFToken': csrftoken.value,
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-        'cookie': headers['cookie'],
-        'Referer': EDX_HOMEPAGE,
-        'X-Requested-With': 'XMLHttpRequest'
-    }
-    logging.debug('PywebCopy Headers built: %s', headers)
-    return headers
+    # headers = {
+    #     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+    #                   'Chrome/79.0.3945.88 Safari/537.36',
+    #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+    #     'X-CSRFToken': csrftoken.value,
+    #     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    #     'cookie': headers['cookie'],
+    #     'Referer': EDX_HOMEPAGE,
+    #     'X-Requested-With': 'XMLHttpRequest'
+   # }
+    logging.debug('Headers built: %s', headers)
+    return session
 
-def extract_units(url, headers, file_formats):
+
+def extract_units(url, session, file_formats):
     """
     Parses a webpage and extracts its resources e.g. video_url, sub_url, etc.
     """
     logging.info("Processing '%s'", url)
 
-    page = get_page_contents(url, headers)
+    page = get_page_contents(url, session)
     page_extractor = get_page_extractor(url)
     units = page_extractor.extract_units_from_html(page, BASE_URL, file_formats)
 
     return units
 
 
-def extract_all_units_in_sequence(urls, headers, file_formats):
+def extract_all_units_in_sequence(urls, session, file_formats):
     """
     Returns a dict of all the units in the selected_sections: {url, units}
     sequentially, this is clearer for debug purposes
@@ -492,7 +488,7 @@ def extract_all_units_in_sequence(urls, headers, file_formats):
     logging.info('Extracting all units information in sequentially.')
     logging.debug('urls: ' + str(urls))
 
-    units = [extract_units(url, headers, file_formats) for url in urls]
+    units = [extract_units(url, session, file_formats) for url in urls]
     all_units = dict(zip(urls, units))
 
     return all_units
@@ -727,9 +723,6 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     if is_youtube_url(url):
         filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
         filename = os.path.join(target_dir, filename_template)
-    elif is_web_page_url(url):
-        # filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
-        filename = f"{target_dir}/{filename_prefix}-webpage"
     else:
         original_filename = url.rsplit('/', 1)[1]
         filename = os.path.join(target_dir,
@@ -738,15 +731,13 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     return filename
 
 
-def download_url(url, filename, headers, args, **options):
+def download_url(url, filename, headers, args):
     """
     Downloads the given url in filename.
     """
 
     if is_youtube_url(url):
         download_youtube_url(url, filename, headers, args)
-    elif is_web_page_url(url):
-        save_unit_webpage(url, filename)
     else:
         import ssl
         import requests
@@ -807,7 +798,7 @@ def download_subtitle(url, filename, headers, args):
             f.write(subs_string.encode('utf-8'))
 
 
-def skip_or_download(downloads, headers, args, f=download_url, **options):
+def skip_or_download(downloads, headers, args, f=download_url):
     """
     downloads url into filename using download function f,
     if filename exists it skips
@@ -820,10 +811,7 @@ def skip_or_download(downloads, headers, args, f=download_url, **options):
             logging.info('[download] %s => %s', url, filename)
         if args.dry_run:
             continue
-        if not options:
-            f(url, filename, headers, args)
-        else:
-            f(url, filename, headers, args, pyweb_session=options['pyweb_session'])
+        f(url, filename, headers, args)
 
 
 def download_video(video, args, target_dir, filename_prefix, headers):
@@ -847,15 +835,7 @@ def download_video(video, args, target_dir, filename_prefix, headers):
         skip_or_download(sub_downloads, headers, args, download_subtitle)
 
 
-def download_web_page(unit_url, target_dir, filename_prefix, **options):
-    if unit_url is not None:
-        web_page_downloads = _build_url_downloads([unit_url[0].unit_page_url],
-                                                  target_dir,
-                                                  filename_prefix)
-        skip_or_download(web_page_downloads, options['headers'], options['args'], pyweb_session= options['pyweb_session'])
-
-
-def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_session):
+def download_unit(unit, args, target_dir, filename_prefix, headers):
     """
     Downloads the urls in unit based on args in the given target_dir
     with filename_prefix
@@ -863,9 +843,6 @@ def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_sessio
     if len(unit.videos) == 1:
         download_video(unit.videos[0], args, target_dir, filename_prefix,
                        headers)
-    elif len(unit.unit_url) >= 1:
-        # web_page_downloads = _build_url_downloads(unit.unit_url, target_dir, filename_prefix)
-        download_web_page(unit.unit_url, target_dir, filename_prefix, pyweb_session=pyweb_session, headers=headers, args =args)
     else:
         # we change the filename_prefix to avoid conflicts when downloading
         # subtitles
@@ -873,29 +850,18 @@ def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_sessio
             new_prefix = filename_prefix + ('-%02d' % i)
             download_video(video, args, target_dir, new_prefix, headers)
 
-
     res_downloads = _build_url_downloads(unit.resources_urls, target_dir,
                                          filename_prefix)
-
-
     skip_or_download(res_downloads, headers, args)
 
 
-def save_unit_webpage(unit_url, target_dir):
-    # url = unit_url
-    # target_dir = target_dir
-    config.setup_config(unit_url, target_dir, project_name=None, over_write=True, bypass_robots=True)
-    wp = WebPage()
-    # wp.file_path = target_dir
-    wp.get(unit_url)
-    wp.save_complete()
-
-
-def download(args, selections, all_units, headers, pyweb_session):
+def download(args, selections, all_units, session):
     """
     Downloads all the resources based on the selections
     """
     logging.info("Output directory: " + args.output_dir)
+
+
 
     # Download Videos
     # notice that we could iterate over all_units, but we prefer to do it over
@@ -906,22 +872,23 @@ def download(args, selections, all_units, headers, pyweb_session):
         for selected_section in selected_sections:
             section_dirname = "%02d-%s" % (selected_section.position,
                                            selected_section.name)
-            #target_dir = os.path.join(args.output_dir, coursename,
-             #                         clean_filename(section_dirname))
-            #mkdir_p(target_dir)
+            target_dir = os.path.join(args.output_dir, coursename,
+                                      clean_filename(section_dirname))
+            mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
-                subsection_dirname = "%02d-%s" % (subsection.position,
-                                            subsection.name)
-                target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
-                                       clean_filename(subsection_dirname))
-                mkdir_p(target_subsection_dir)
+                # download_web_page(subsection, target_dir, session)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
-                    download_unit(unit, args, target_subsection_dir, filename_prefix,
-                                  headers, pyweb_session )
+                    download_unit(unit, args, target_dir, filename_prefix,
+                                  headers)
+
+
+def download_web_page(subsection, target_dir, session):
+
+    pywebcopy.save_webpage(subsection.url, target_dir)
 
 
 def remove_repeated_urls(all_units):
@@ -952,13 +919,10 @@ def remove_repeated_urls(all_units):
                                         mp4_urls=mp4_urls))
 
             resources_urls, existing_urls = remove_duplicates(unit.resources_urls, existing_urls)
-            unit_url, existing_urls = remove_duplicates(unit.unit_url, existing_urls)
 
-
-            if len(videos) > 0 or len(resources_urls) > 0 or len(unit_url) > 0:
+            if len(videos) > 0 or len(resources_urls) > 0:
                 reduced_units.append(Unit(videos=videos,
-                                          resources_urls=resources_urls,
-                                          unit_url=unit_url))
+                                          resources_urls=resources_urls))
 
         filtered_units[url] = reduced_units
     return filtered_units
@@ -979,13 +943,11 @@ def num_urls_in_units_dict(units_dict):
                 num_urls += int(video.sub_template_url is not None)
                 num_urls += len(video.mp4_urls)
             num_urls += len(unit.resources_urls)
-            num_urls += len(unit.unit_url)
-
 
     return num_urls
 
 
-def extract_all_units_with_cache(all_urls, headers, file_formats,
+def extract_all_units_with_cache(all_urls, file_formats, session,
                                  filename=DEFAULT_CACHE_FILENAME,
                                  extractor=extract_all_units_in_parallel):
     """
@@ -1007,7 +969,7 @@ def extract_all_units_with_cache(all_urls, headers, file_formats,
     new_urls = [url for url in all_urls if url not in cached_units]
     logging.info('loading %d urls from cache [%s]', len(cached_units.keys()),
                  filename)
-    new_units = extractor(new_urls, headers, file_formats)
+    new_units = extractor(new_urls, file_formats)
     all_units = cached_units.copy()
     all_units.update(new_units)
 
@@ -1081,35 +1043,32 @@ def main():
         exit(ExitCode.MISSING_CREDENTIALS)
 
     # Prepare Headers
-    headers = edx_get_headers()
+    s = requests.Session()
+    # = edx_get_headers(s)
+    s = edx_get_headers(s)
+    pyweb_initiate_session()
 
-    # Prepare PyWebCopy Headers
-    pyweb_session= pywebcopy.SESSION
-    pyweb_session_headers = pywebcopy_get_headers(pyweb_session, args.username, args.password)
-
-    # establish PyWebCopy Session
-    pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, args.username, args.password, pyweb_session)
     # Login
-    resp = edx_login(LOGIN_API, headers, args.username, args.password)
-    if not resp.get('success', False):
+    resp = edx_login(LOGIN_API, args.username, args.password, s)
+
+    # if not resp.get('success', False):
+    if not resp == 200:
         logging.error(resp.get('value', "Wrong Email or Password."))
         exit(ExitCode.WRONG_EMAIL_OR_PASSWORD)
 
     # Parse and select the available courses
-    courses = get_courses_info(DASHBOARD, headers)
+    courses = get_courses_info(DASHBOARD, s)
     available_courses = [course for course in courses if course.state == 'Started']
     selected_courses = parse_courses(args, available_courses)
 
     # Parse the sections and build the selections dict filtered by sections
     if args.platform == 'edx':
         all_selections = {selected_course:
-                          get_available_sections(selected_course.url.replace('info', 'course'),
-                                                 headers)
+                          get_available_sections(selected_course.url.replace('info', 'course'),s)
                           for selected_course in selected_courses}
     else:
         all_selections = {selected_course:
-                          get_available_sections(selected_course.url.replace('info', 'courseware'),
-                                                 headers)
+                          get_available_sections(selected_course.url.replace('info', 'courseware'),s)
                           for selected_course in selected_courses}
 
     selections = parse_sections(args, all_selections)
@@ -1123,24 +1082,16 @@ def main():
                 for selected_section in selected_sections
                 for subsection in selected_section.subsections]
 
-    all_web_pages = {}
-    for selected_sections in selections.values():
-        for selected_section in selected_sections:
-            for k, v in enumerate(selected_section.subsections):
-
-                all_web_pages.update({v.url: v.name})
-
-
     extractor = extract_all_units_in_parallel
     if args.sequential:
         extractor = extract_all_units_in_sequence
 
     if args.cache:
-        all_units = extract_all_units_with_cache(all_urls, headers,
-                                                 file_formats,
+        all_units = extract_all_units_with_cache(all_urls,
+                                                 file_formats, s,
                                                  extractor=extractor)
     else:
-        all_units = extractor(all_urls, headers, file_formats)
+        all_units = extractor(all_urls, s, file_formats)
 
     parse_units(selections)
 
@@ -1152,7 +1103,6 @@ def main():
     # better approach will be to create symbolic or hard links for the repeated
     # units to avoid losing information
     filtered_units = remove_repeated_urls(all_units)
-    # filtered_units = add_web_page_name_to_extract(all_web_pages, filtered_units)
     num_all_urls = num_urls_in_units_dict(all_units)
     num_filtered_urls = num_urls_in_units_dict(filtered_units)
     logging.warn('Removed %d duplicated urls from %d in total',
@@ -1164,9 +1114,30 @@ def main():
         urls = extract_urls_from_units(filtered_units, args.export_format)
         save_urls_to_file(urls, args.export_filename)
     else:
-        download(args, selections, filtered_units, headers, pyweb_session)
+        download(args, selections, filtered_units, s)
 
 
+def pyweb_initiate_session():
+    pywebcopy.SESSION.get(BASE_URL)
+    csrftokenv1 = pywebcopy.SESSION.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers = {}
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in pywebcopy.SESSION.cookies])
+    payload = {'email': 'jturner421@gmail.com', 'password': 'durin7456'}
+    headers = {
+        'X-CSRFToken': csrftokenv1.value,
+        'Referer': 'https://courses.edx.org/login',
+        'Host': 'courses.edx.org',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'cookie': headers['cookie'],
+        'Accept - Encoding': 'gzip, deflate, br',
+        'content-type': 'application/x-www-form-urlencoded',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,'
+                  'application/signed-exchange;v=b3;q=0.9'
+    }
+    pywebcopy.SESSION.post(LOGIN_API, data=payload, headers=headers)
+    pywebcopy.save_webpage('https://courses.edx.org/courses/course-v1:W3Cx+CSS.0x+3T2019/jump_to/block-v1:W3Cx+CSS.0x+3T2019+type@vertical+block@71deac64f61a420781f0ed127d36e696',
+                           '/Users/jwt/PycharmProjects/edx-dl/Downloaded/CSS_Basics')
 
 
 if __name__ == '__main__':
