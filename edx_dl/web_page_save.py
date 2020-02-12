@@ -61,8 +61,6 @@ def save_web_page(url, target_dir, pyweb_session):
 def extract_course_hierachy(sub_sec,section_list):
     sub_sec_list = []
     for child in sub_sec:
-
-
         if child is not None:
 
             section_name = child.parent.parent.h3.text.strip()
@@ -72,6 +70,8 @@ def extract_course_hierachy(sub_sec,section_list):
             link_list = []
             for link in links:
                 link_name = link.text.strip()
+                if link_name.find("\n"):
+                    link_name = link_name[:link_name.find("\n")]
                 try:
                     link_url = link.attrs['href']
                 except TypeError:
@@ -109,6 +109,7 @@ def main():
     section_list = []
     course_urls = extract_course_hierachy(sub_sec, section_list)
     # create master dictionary of urls for loookup
+    # url_dict = dict((i['subsection'], i['links']) for i in course_urls[1])
     url_dict = dict((i['subsection'], i['links']) for i in course_urls[1])
     # section_list_dict = dict((i['section_name'], i['subsections']) for i in course_urls[0])
     # get output directories for course
@@ -123,14 +124,16 @@ def main():
         # get course list
         urls = url_dict[url_key]
         save_path = next(section_name for section_name in file_list if section_name in section_name)
-        page_save_path = pathlib.Path(output_path).joinpath('web', save_path)
-        for index, url in enumerate(urls):
-            while index < 1:
-                for value in enumerate(url):
-                    k = (value[1])
-                    url = url[k]
-                    save_web_page(url, str(page_save_path), pyweb_session)
-
+        page_save_path = pathlib.Path(output_path).joinpath(save_path, url_key)
+        url = urls[0][url_key]
+        save_web_page(url, str(page_save_path), pyweb_session)
+        # for index, url in enumerate(urls):
+        #     while index < 1:
+        #         for value in enumerate(url):
+        #             k = (value[1])
+        #             url = url[k]
+        #             save_web_page(url, str(page_save_path), pyweb_session)
+        #             print('done')
 
 
 
