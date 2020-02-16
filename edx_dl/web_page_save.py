@@ -95,8 +95,9 @@ def _strip_characters_from_link_text(link_name):
     return link_name
 
 
-def set_page_save_path(file_list, output_path, url_key):
-    save_path = next(section_name for section_name in file_list if section_name in section_name)
+def set_page_save_path(file_list, substring, output_path, url_key):
+    # save_path = next(section_name for section_name in file_list if section_name in section_name)
+    save_path = next(i for i in file_list if substring in i)
     page_save_path = pathlib.Path(output_path).joinpath(save_path, url_key)
     return page_save_path
 
@@ -118,8 +119,14 @@ def find_subsections(soup):
     sub_sec = soup.find_all(True, {"class": ["subsection accordion", "subsection accordion graded scored"]})
     return sub_sec
 
+def create_symlink(page_save_path):
+    source = list(page_save_path.rglob('*.html'))
+    dest = page_save_path / 'index.html'
+    os.symlink(source[0], dest)
+
 
 def main():
+
     username = 'jturner421@gmail.com'
     password = 'durin7456'
     LOGIN_API = 'https://courses.edx.org/login_ajax'
@@ -153,11 +160,14 @@ def main():
         url_key = sub_section['subsection']
         # get course list
         urls = url_dict[url_key]
-        page_save_path = set_page_save_path(file_list, output_path, url_key)
+        page_save_path = set_page_save_path(file_list, section_name, output_path, url_key)
         url = urls[0][url_key]
-        save_web_page(url, str(page_save_path), pyweb_session)
-
+        save_web_page(url, os.fspath(page_save_path), pyweb_session)
+        # TODO Create symbolic link back to saved page
+        create_symlink(page_save_path)
         print(section_name)
+
+
 
 
 if __name__ == '__main__':
