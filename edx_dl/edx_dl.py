@@ -392,11 +392,11 @@ def parse_args():
                         version=__version__,
                         help='display version and exit')
 
-    parser.add_argument('--webpage',
-                        action='store',
-                        default=False,
-                        version=__version__,
-                        help='download web pages for course')
+    # parser.add_argument('--webpage',
+    #                     action='store',
+    #                     default=False,
+    #                     version=__version__,
+    #                     help='download web pages for course')
 
     args = parser.parse_args()
 
