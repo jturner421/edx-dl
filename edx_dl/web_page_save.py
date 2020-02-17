@@ -2,10 +2,13 @@ import logging
 import os
 import pathlib
 
+
 import pywebcopy
 from bs4 import BeautifulSoup
 from pywebcopy import save_webpage
 
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 def pyweb_login(url, headers, username, password, session):
     """
@@ -59,9 +62,9 @@ def save_web_page(url, target_dir, pyweb_session):
 
 def extract_course_hierachy(sub_sec, section_list):
     sub_sec_list = []
+    # TODO: need to fix this. They changed the html
     for child in sub_sec:
         if child is not None:
-
             section_name = child.parent.parent.h3.text.strip()
             section_name = section_name.replace(":", "").replace("-", "").replace(" ", "_")
             subsection_heading = child.h4.text.strip()
@@ -97,8 +100,9 @@ def _strip_characters_from_link_text(link_name):
 
 def set_page_save_path(file_list, substring, output_path, url_key):
     # save_path = next(section_name for section_name in file_list if section_name in section_name)
-    save_path = next(i for i in file_list if substring in i)
-    page_save_path = pathlib.Path(output_path).joinpath(save_path, url_key)
+
+    save_path = process.extractOne(substring, file_list)
+    page_save_path = pathlib.Path(output_path).joinpath(save_path[0], url_key)
     return page_save_path
 
 
@@ -116,7 +120,10 @@ def create_url_dictionary(course_urls):
 
 
 def find_subsections(soup):
-    sub_sec = soup.find_all(True, {"class": ["subsection accordion", "subsection accordion graded scored"]})
+    # sub_sec = soup.find_all(True, {"class": ["subsection accordion", "subsection accordion graded scored"]})sub_sec = soup.find_all(True, {"class": ["subsection accordion", "subsection accordion graded scored"]})
+    # sub_sec = soup.find_all('h4')
+    # sub_sec = soup.find_all(class_="outline-item section")
+    sub_sec = soup.select("li.subsection")
     return sub_sec
 
 def create_symlink(page_save_path):
@@ -127,10 +134,10 @@ def create_symlink(page_save_path):
 
 def main():
 
-    username = 'jturner421@gmail.com'
-    password = 'durin7456'
+    username = 'bobj88161@gmail.com'
+    password = 'JO%bM1n#'
     LOGIN_API = 'https://courses.edx.org/login_ajax'
-    course_url = 'https://courses.edx.org/courses/course-v1:Harvardx+HLS2X+1T2020/course/'
+    course_url = 'https://courses.edx.org/courses/course-v1:PennX+SD2x+2T2019/course/'
     # Prepare PyWebCopy Headers
     pyweb_session = pywebcopy.SESSION
     pyweb_session_headers = pywebcopy_get_headers(pyweb_session, username, password, LOGIN_API)
@@ -164,7 +171,10 @@ def main():
         url = urls[0][url_key]
         save_web_page(url, os.fspath(page_save_path), pyweb_session)
         # TODO Create symbolic link back to saved page
-        create_symlink(page_save_path)
+        try:
+            create_symlink(page_save_path)
+        except FileExistsError:
+            continue
         print(section_name)
 
 

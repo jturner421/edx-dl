@@ -382,13 +382,15 @@ class NewEdXPageExtractor(CurrentEdXPageExtractor):
 
         def _make_subsections(section_soup):
             try:
-                subsections_soup = section_soup.select("li.vertical.outline-item.focusable")
+               # subsections_soup = section_soup.select("li.vertical.outline-item.focusable")
+                subsections_soup = section_soup.select("li.subsection")
             except AttributeError:
                 return []
             # FIXME correct extraction of subsection.name (unicode)
             subsections = [SubSection(position=i,
                                       url=s.a['href'],
-                                      name=s.a.div.div.string.strip())
+                                      # name=s.a.div.div.string.strip())
+                                      name=s.a.h4.string.strip())
                            for i, s in enumerate(subsections_soup, 1)]
 
             return subsections
