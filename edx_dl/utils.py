@@ -40,6 +40,10 @@ def execute_command(cmd, args):
             logging.warn('External command error ignored: %s', e)
         else:
             raise e
+            print(f'Failed to download {cmd[6]}')
+            print(f'Continuing with next video')
+            pass
+
 
 
 def directory_name(initial_name):

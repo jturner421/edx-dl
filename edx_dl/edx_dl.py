@@ -15,6 +15,7 @@ import pickle
 import re
 import sys
 
+from pathlib import Path
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -422,7 +423,7 @@ def edx_get_headers():
     logging.info('Building initial headers for future requests.')
 
     headers = {
-        'User-Agent': 'edX-downloader/0.01',
+        'User-Agent': 'Mozilla/5.0',
         'Accept': 'application/json, text/javascript, */*; q=0.01',
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
         'Referer': EDX_HOMEPAGE,
@@ -744,6 +745,7 @@ def download_youtube_url(url, filename, headers, args):
     """
     logging.info('Downloading video with URL %s from YouTube.', url)
     video_format_option = args.format + '/mp4' if args.format else 'mp4'
+
     cmd = YOUTUBE_DL_CMD + ['-o', filename, '-f', video_format_option]
 
     if args.subtitles:
