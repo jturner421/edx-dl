@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 from six.moves import html_parser
 from bs4 import BeautifulSoup as BeautifulSoup_
 
-from .common import Course, Section, SubSection, Unit, Video
+from .common import Course, Section, SubSection, Unit, UnitUrl, Video
 
 
 # Force use of bs4 with html.parser
@@ -81,7 +81,7 @@ class PageExtractor(object):
 
 class ClassicEdXPageExtractor(PageExtractor):
 
-    def extract_units_from_html(self, page, BASE_URL, file_formats):
+    def extract_units_from_html(self, page, BASE_URL, file_formats,url):
         """
         Extract Units from the html of a subsection webpage as a list of
         resources
@@ -92,17 +92,19 @@ class ClassicEdXPageExtractor(PageExtractor):
         re_units = re.compile('(<div?[^>]id="seq_contents_\d+".*?>.*?<\/div>)',
                               re.DOTALL)
         units = []
-
+        units.append(url)
         for unit_html in re_units.findall(page):
             unit = self.extract_unit(unit_html, BASE_URL, file_formats)
-            if len(unit.videos) > 0 or len(unit.resources_urls) > 0:
-                units.append(unit)
+            # if len(unit.videos) > 0 or len(unit.resources_urls) > 0:
+            #     units.append(unit)
+            units.append(unit)
         return units
 
     def extract_unit(self, text, BASE_URL, file_formats):
         """
         Parses the <div> of each unit and extracts the urls of its resources
         """
+        unit_url = []
         video_youtube_url = self.extract_video_youtube_url(text)
         available_subs_url, sub_template_url = self.extract_subtitle_urls(text, BASE_URL)
         mp4_urls = self.extract_mp4_urls(text)
@@ -286,6 +288,7 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
     def extract_unit(self, text, BASE_URL, file_formats):
         re_metadata = re.compile(r'data-metadata=&#39;(.*?)&#39;')
         videos = []
+        unit_url= []
         match_metadatas = re_metadata.findall(text)
         for match_metadata in match_metadatas:
             metadata = html_parser.HTMLParser().unescape(match_metadata)
@@ -311,7 +314,7 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
 
         resources_urls = self.extract_resources_urls(text, BASE_URL,
                                                      file_formats)
-        return Unit(videos=videos, resources_urls=resources_urls)
+        return Unit(videos=videos, resources_urls=resources_urls,unit_url=[self.unit_page_url])
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
@@ -362,6 +365,8 @@ class NewEdXPageExtractor(CurrentEdXPageExtractor):
     """
     A new page extractor for the latest changes in layout of edx
     """
+    def __init__(self, unit_page_url):
+        self.unit_page_url = unit_page_url
 
     def extract_sections_from_html(self, page, BASE_URL):
         """
@@ -416,17 +421,25 @@ def get_page_extractor(url):
         url.startswith('https://courses.edx.org') or
         url.startswith('https://mitxpro.mit.edu')
     ):
-        return NewEdXPageExtractor()
+        return NewEdXPageExtractor(url)
     elif (
         url.startswith('https://edge.edx.org') or
         url.startswith('https://lagunita.stanford.edu') or
         url.startswith('https://www.fun-mooc.fr')
     ):
-        return NewEdXPageExtractor()
+        return NewEdXPageExtractor(url)
     else:
         return ClassicEdXPageExtractor()
 
 
 def is_youtube_url(url):
-    re_youtube_url = re.compile(r'(https?\:\/\/(?:www\.)?(?:youtube\.com|youtu\.?be)\/.*?)')
-    return re_youtube_url.match(url)
+    try:
+        re_youtube_url = re.compile(r'(https?\:\/\/(?:www\.)?(?:youtube\.com|youtu\.?be)\/.*?)')
+        return re_youtube_url.match(url)
+    except TypeError:
+        pass
+
+
+def is_web_page_url(url):
+    re_web_page_url = re.compile(r'(https?\:\/\/)(?:courses\.)?(edx.org)?(\/courses\/)')
+    return re_web_page_url.match(url)
