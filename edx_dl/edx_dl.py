@@ -20,7 +20,7 @@ from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pywebcopy
-from pywebcopy import save_webpage
+# from pywebcopy import save_webpage
 from pywebcopy import WebPage, config
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
@@ -33,6 +33,7 @@ from six.moves.urllib.request import (
     Request,
     urlretrieve,
 )
+from urllib3.util import timeout
 
 from ._version import __version__
 
@@ -752,7 +753,10 @@ def download_url(url, filename, headers, args, **options):
     if is_youtube_url(url):
         download_youtube_url(url, filename, headers, args)
     elif is_web_page_url(url):
-        save_unit_webpage(url, filename)
+        try:
+            save_unit_webpage(url, filename)
+        except Exception:
+            pass
     else:
         import ssl
         import requests
@@ -890,9 +894,16 @@ def save_unit_webpage(unit_url, target_dir):
     # target_dir = target_dir
     config.setup_config(unit_url, target_dir, project_name=None, over_write=True, bypass_robots=True)
     wp = WebPage()
-    # wp.file_path = target_dir
     wp.get(unit_url)
     wp.save_complete()
+
+    # join the sub threads
+    # for t in wp._threads:
+    #     if t.is_alive():
+    #         t.join(timeout)
+
+    # location of the html file written
+    return wp.file_path
 
 def download(args, selections, all_units, headers, pyweb_session):
     """
