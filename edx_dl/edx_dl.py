@@ -19,6 +19,9 @@ from pathlib import Path
 from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 
+import pywebcopy
+# from pywebcopy import save_webpage
+from pywebcopy import WebPage, config
 from six.moves.http_cookiejar import CookieJar
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlencode
@@ -30,6 +33,7 @@ from six.moves.urllib.request import (
     Request,
     urlretrieve,
 )
+from urllib3.util import timeout
 
 from ._version import __version__
 
@@ -38,6 +42,7 @@ from .common import (
     DEFAULT_CACHE_FILENAME,
     Unit,
     Video,
+    UnitUrl,
     ExitCode,
     DEFAULT_FILE_FORMATS,
 )
@@ -45,6 +50,7 @@ from .parsing import (
     edx_json2srt,
     get_page_extractor,
     is_youtube_url,
+    is_web_page_url,
 )
 from .utils import (
     clean_filename,
@@ -232,6 +238,16 @@ def edx_login(url, headers, username, password):
 
     return resp
 
+def pyweb_login(url, headers, username, password, session):
+    """
+    Log in user into the openedx website for pywebcopy.
+    """
+    payload = {'email': username,
+               'password': password
+               }
+
+    response = session.post(url, data=payload, headers=headers)
+    return response
 
 def parse_args():
     """
@@ -434,6 +450,33 @@ def edx_get_headers():
     logging.debug('Headers built: %s', headers)
     return headers
 
+def pywebcopy_get_headers(session, username, password):
+    """
+    Build the Open edX headers to create future requests.
+
+    """
+    logging.info('Building Pywebcopy headers for future requests.')
+
+    headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
+               'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko)'
+                             'Chrome/79.0.3945.88 Safari/537.36'}
+    session.get(EDX_HOMEPAGE, headers=headers)
+
+    csrftoken = session.cookies._cookies['courses.edx.org']['/']['csrftoken']
+    headers['cookie'] = '; '.join([x.name + '=' + x.value for x in session.cookies])
+
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/79.0.3945.88 Safari/537.36',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'X-CSRFToken': csrftoken.value,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        'cookie': headers['cookie'],
+        'Referer': EDX_HOMEPAGE,
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+    logging.debug('PywebCopy Headers built: %s', headers)
+    return headers
 
 def extract_units(url, headers, file_formats):
     """
@@ -443,7 +486,7 @@ def extract_units(url, headers, file_formats):
 
     page = get_page_contents(url, headers)
     page_extractor = get_page_extractor(url)
-    units = page_extractor.extract_units_from_html(page, BASE_URL, file_formats)
+    units = page_extractor.extract_units_from_html(page, BASE_URL, file_formats, url)
 
     return units
 
@@ -691,6 +734,9 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     if is_youtube_url(url):
         filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
         filename = os.path.join(target_dir, filename_template)
+    elif is_web_page_url(url):
+        # filename_template = filename_prefix + "-%(title)s-%(id)s.%(ext)s"
+        filename = f"{target_dir}/{filename_prefix}-webpage"
     else:
         original_filename = url.rsplit('/', 1)[1]
         filename = os.path.join(target_dir,
@@ -699,13 +745,18 @@ def _build_filename_from_url(url, target_dir, filename_prefix):
     return filename
 
 
-def download_url(url, filename, headers, args):
+def download_url(url, filename, headers, args, **options):
     """
     Downloads the given url in filename.
     """
 
     if is_youtube_url(url):
         download_youtube_url(url, filename, headers, args)
+    elif is_web_page_url(url):
+        try:
+            save_unit_webpage(url, filename)
+        except Exception:
+            pass
     else:
         import ssl
         import requests
@@ -767,7 +818,7 @@ def download_subtitle(url, filename, headers, args):
             f.write(subs_string.encode('utf-8'))
 
 
-def skip_or_download(downloads, headers, args, f=download_url):
+def skip_or_download(downloads, headers, args, f=download_url, **options):
     """
     downloads url into filename using download function f,
     if filename exists it skips
@@ -780,7 +831,10 @@ def skip_or_download(downloads, headers, args, f=download_url):
             logging.info('[download] %s => %s', url, filename)
         if args.dry_run:
             continue
-        f(url, filename, headers, args)
+        if not options:
+            f(url, filename, headers, args)
+        else:
+            f(url, filename, headers, args, pyweb_session=options['pyweb_session'])
 
 
 def download_video(video, args, target_dir, filename_prefix, headers):
@@ -803,8 +857,15 @@ def download_video(video, args, target_dir, filename_prefix, headers):
                                                    filename_prefix, headers)
         skip_or_download(sub_downloads, headers, args, download_subtitle)
 
+def download_web_page(unit_url, target_dir, filename_prefix, **options):
+    if unit_url is not None:
+        web_page_downloads = _build_url_downloads([unit_url[0]],
+                                                  target_dir,
+                                                  filename_prefix)
+        skip_or_download(web_page_downloads, options['headers'], options['args'], pyweb_session= options['pyweb_session'])
 
-def download_unit(unit, args, target_dir, filename_prefix, headers):
+
+def download_unit(unit, args, target_dir, filename_prefix, headers, pyweb_session):
     """
     Downloads the urls in unit based on args in the given target_dir
     with filename_prefix
@@ -823,8 +884,28 @@ def download_unit(unit, args, target_dir, filename_prefix, headers):
                                          filename_prefix)
     skip_or_download(res_downloads, headers, args)
 
+    if len(unit.unit_url) >= 1:
+        # web_page_downloads = _build_url_downloads(unit.unit_url, target_dir, filename_prefix)
+        download_web_page(unit.unit_url, target_dir, filename_prefix, pyweb_session=pyweb_session, headers=headers,
+                          args =args)
 
-def download(args, selections, all_units, headers):
+def save_unit_webpage(unit_url, target_dir):
+    # url = unit_url
+    # target_dir = target_dir
+    config.setup_config(unit_url, target_dir, project_name=None, over_write=True, bypass_robots=True)
+    wp = WebPage()
+    wp.get(unit_url)
+    wp.save_complete()
+
+    # join the sub threads
+    # for t in wp._threads:
+    #     if t.is_alive():
+    #         t.join(timeout)
+
+    # location of the html file written
+    return wp.file_path
+
+def download(args, selections, all_units, headers, pyweb_session):
     """
     Downloads all the resources based on the selections
     """
@@ -844,12 +925,17 @@ def download(args, selections, all_units, headers):
             mkdir_p(target_dir)
             counter = 0
             for subsection in selected_section.subsections:
+                subsection_dirname = "%02d-%s" % (subsection.position,
+                                            subsection.name)
+                target_subsection_dir = os.path.join(args.output_dir, coursename, section_dirname,
+                                       clean_filename(subsection_dirname))
+                mkdir_p(target_subsection_dir)
                 units = all_units.get(subsection.url, [])
                 for unit in units:
                     counter += 1
                     filename_prefix = "%02d" % counter
-                    download_unit(unit, args, target_dir, filename_prefix,
-                                  headers)
+                    download_unit(unit, args, target_subsection_dir, filename_prefix,
+                                  headers, pyweb_session )
 
 
 def remove_repeated_urls(all_units):
@@ -863,27 +949,31 @@ def remove_repeated_urls(all_units):
         reduced_units = []
         for unit in units:
             videos = []
-            for video in unit.videos:
-                # we don't analyze the subtitles for repetition since
-                # their size is negligible for the goal of this function
-                video_youtube_url = None
-                if video.video_youtube_url not in existing_urls:
-                    video_youtube_url = video.video_youtube_url
-                    existing_urls.add(video_youtube_url)
+            if type(unit) == Unit:
+                for video in unit.videos:
+                    # we don't analyze the subtitles for repetition since
+                    # their size is negligible for the goal of this function
+                    video_youtube_url = None
+                    if video.video_youtube_url not in existing_urls:
+                        video_youtube_url = video.video_youtube_url
+                        existing_urls.add(video_youtube_url)
 
-                mp4_urls, existing_urls = remove_duplicates(video.mp4_urls, existing_urls)
+                    mp4_urls, existing_urls = remove_duplicates(video.mp4_urls, existing_urls)
 
-                if video_youtube_url is not None or len(mp4_urls) > 0:
-                    videos.append(Video(video_youtube_url=video_youtube_url,
-                                        available_subs_url=video.available_subs_url,
-                                        sub_template_url=video.sub_template_url,
-                                        mp4_urls=mp4_urls))
+                    if video_youtube_url is not None or len(mp4_urls) > 0:
+                        videos.append(Video(video_youtube_url=video_youtube_url,
+                                            available_subs_url=video.available_subs_url,
+                                            sub_template_url=video.sub_template_url,
+                                            mp4_urls=mp4_urls))
+                resources_urls, existing_urls = remove_duplicates(unit.resources_urls, existing_urls)
+                unit_url, existing_urls = remove_duplicates(unit.unit_url, existing_urls)
+            else:
+                continue # skip str
 
-            resources_urls, existing_urls = remove_duplicates(unit.resources_urls, existing_urls)
-
-            if len(videos) > 0 or len(resources_urls) > 0:
+            if len(videos) > 0 or len(resources_urls) > 0 or len(unit_url) > 0:
                 reduced_units.append(Unit(videos=videos,
-                                          resources_urls=resources_urls))
+                                          resources_urls=resources_urls,
+                                          unit_url=unit_url))
 
         filtered_units[url] = reduced_units
     return filtered_units
@@ -898,12 +988,16 @@ def num_urls_in_units_dict(units_dict):
 
     for units in units_dict.values():
         for unit in units:
-            for video in unit.videos:
-                num_urls += int(video.video_youtube_url is not None)
-                num_urls += int(video.available_subs_url is not None)
-                num_urls += int(video.sub_template_url is not None)
-                num_urls += len(video.mp4_urls)
-            num_urls += len(unit.resources_urls)
+            if type(unit) ==Unit:
+                for video in unit.videos:
+                    num_urls += int(video.video_youtube_url is not None)
+                    num_urls += int(video.available_subs_url is not None)
+                    num_urls += int(video.sub_template_url is not None)
+                    num_urls += len(video.mp4_urls)
+                num_urls += len(unit.resources_urls)
+                num_urls += len(unit.unit_url)
+            else:
+                pass
 
     return num_urls
 
@@ -1006,6 +1100,13 @@ def main():
     # Prepare Headers
     headers = edx_get_headers()
 
+    # Prepare PyWebCopy Headers
+    pyweb_session= pywebcopy.SESSION
+    pyweb_session_headers = pywebcopy_get_headers(pyweb_session, args.username, args.password)
+
+    # establish PyWebCopy Session
+    pyweb_session = pyweb_login(LOGIN_API, pyweb_session_headers, args.username, args.password, pyweb_session)
+
     # Login
     resp = edx_login(LOGIN_API, headers, args.username, args.password)
     if not resp.get('success', False):
@@ -1040,6 +1141,16 @@ def main():
                 for selected_section in selected_sections
                 for subsection in selected_section.subsections]
 
+    # all_web_pages = {}
+    # for selected_sections in selections.values():
+    #     for selected_section in selected_sections:
+    #         for subsection in selected_section.subsections:
+    #             try:
+    #                 all_web_pages.update({subsection.url: subsection.name})
+    #                         # all_web_pages.update({v.url: v.name})
+    #             except AttributeError:
+    #                 pass
+
     extractor = extract_all_units_in_parallel
     if args.sequential:
         extractor = extract_all_units_in_sequence
@@ -1072,7 +1183,9 @@ def main():
         urls = extract_urls_from_units(filtered_units, args.export_format)
         save_urls_to_file(urls, args.export_filename)
     else:
-        download(args, selections, filtered_units, headers)
+        download(args, selections, filtered_units, headers, pyweb_session)
+
+
 
 
 if __name__ == '__main__':

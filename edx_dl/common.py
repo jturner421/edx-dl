@@ -88,6 +88,7 @@ class Section(object):
         self.position = position
         self.name = name
         self.url = url
+        self.nav_item_section = None
         self.subsections = subsections
 
 
@@ -109,6 +110,7 @@ class SubSection(object):
         """
         self.position = position
         self.name = name
+        self.nav_item = None
         self.url = url
 
     def __repr__(self):
@@ -118,7 +120,7 @@ class Unit(object):
     """
     Representation of a single unit of the course.
     """
-    def __init__(self, videos, resources_urls):
+    def __init__(self, videos, resources_urls, unit_url):
         """
         @param videos: List of videos present in the unit.
         @type videos: [Video]
@@ -130,6 +132,7 @@ class Unit(object):
         """
         self.videos = videos
         self.resources_urls = resources_urls
+        self.unit_url = unit_url
 
 
 class Video(object):
@@ -155,6 +158,18 @@ class Video(object):
         self.available_subs_url = available_subs_url
         self.sub_template_url = sub_template_url
         self.mp4_urls = mp4_urls
+
+
+class UnitUrl(object):
+    def __init__(self, unit_page_url):
+        """
+        @param unit_page_url: URL link for page.
+        @type unit_page_url: str
+
+        """
+        self.unit_page_url = unit_page_url
+
+
 
 
 class ExitCode(object):
